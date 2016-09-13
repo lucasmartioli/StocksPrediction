@@ -6,7 +6,6 @@
 package stocksprediction;
 
 import java.io.IOException;
-import java.util.Calendar;
 import yahoofinance.YahooFinance;
 import yahoofinance.histquotes.HistoricalQuote;
 import yahoofinance.histquotes.Interval;
