@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package stocksprediction;
+package model;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
@@ -72,7 +72,4 @@ import java.util.Calendar;
         public void setVolume(Long volume) {
             this.volume = volume;
         }
-        
-        
-
     }

@@ -5,17 +5,30 @@
  */
 package stocksprediction;
 
+import java.io.IOException;
+import java.util.Calendar;
+import yahoofinance.YahooFinance;
+import yahoofinance.histquotes.HistoricalQuote;
+import yahoofinance.histquotes.Interval;
+
 /**
  *
  * @author Lucas
  */
+
 public class StocksPrediction {
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
-        // TODO code application logic here
+    public static void main(String[] args) throws IOException {
+        
+        
+        for ( HistoricalQuote arg : YahooFinance.get("ABEV3.SA",Interval.WEEKLY).getHistory()) {
+            System.out.println(arg.toString());           
+        }
+
+        
     }
     
 }
