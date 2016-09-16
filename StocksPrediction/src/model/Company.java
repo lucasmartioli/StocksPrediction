@@ -5,6 +5,9 @@
  */
 package model;
 
+import java.util.List;
+import yahoofinance.histquotes.HistoricalQuote;
+
 /**
  *
  * @author Lucas
@@ -12,29 +15,20 @@ package model;
 public class Company {
 
     private final String simbolo;
-    private StockValues valoresHoje;
-    private StockValues[] historico;
-    
-    public Company( String simbolo ) {
+    private List<HistoricalQuote> historico;
+
+    public Company(String simbolo) {
         this.simbolo = simbolo;
     }
 
-    public StockValues getValoresHoje() {
-        return valoresHoje;
-    }
-
-    public void setValoresHoje(StockValues valoresHoje) {
-        this.valoresHoje = valoresHoje;
-    }
-
-    public StockValues[] getHistorico() {
+    public List<HistoricalQuote> getHistorico() {
         return historico;
     }
 
-    public void setHistorico(StockValues[] historico) {
+    public void setHistorico(List<HistoricalQuote> historico) {
         this.historico = historico;
     }
-    
+
     public String getSimbolo() {
         return simbolo;
     }

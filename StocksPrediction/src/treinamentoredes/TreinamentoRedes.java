@@ -8,10 +8,13 @@ package treinamentoredes;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+import java.util.logging.Level;
 import model.Company;
 import model.ListaEmpresas;
+import yahoofinance.Stock;
 import yahoofinance.YahooFinance;
-import yahoofinance.histquotes.HistoricalQuote;
 import yahoofinance.histquotes.Interval;
 
 /**
@@ -20,25 +23,43 @@ import yahoofinance.histquotes.Interval;
  */
 public class TreinamentoRedes {
 
+    private static Calendar dataInicialTreinamento;
+    private static Calendar dataFinalTreinamento;
+    private static List<Company> empresas;
+
     public TreinamentoRedes() throws IOException {
-        Company[] empresas = new Company[ListaEmpresas.getNumeroTotalDeEmpresas()];
+        
+        ta-lib
+        empresas = new Vector<>();
 
-        for (int i = 0; i < empresas.length; i++) {
-            empresas[i] = new Company(ListaEmpresas.getSimboloEmpresa(i));
-            
+        dataInicialTreinamento = Calendar.getInstance();
+        dataInicialTreinamento.set(14, 1, 1);
 
-            Calendar dataInicialTreinamento = Calendar.getInstance();
-            dataInicialTreinamento.set(1, 1, 13);
-            
-            Calendar dataFinalTreinamento = Calendar.getInstance();
-            dataFinalTreinamento.set(1, 1, 14);
-            
-            List<HistoricalQuote> history = YahooFinance.get(empresas[i].getSimbolo(), dataInicialTreinamento, dataFinalTreinamento, Interval.WEEKLY).getHistory();
-            
-            history.stream().forEach((arg) -> {
-                System.out.println(arg.toString());
-            });
+        dataFinalTreinamento = Calendar.getInstance();
+        dataFinalTreinamento.set(15, 1, 1);
 
+        this.carregaDadosHistoricosParaTreinamento();
+
+    }
+
+    private void carregaDadosHistoricosParaTreinamento() throws IOException {
+
+        //yahoofinance.Utils.
+        YahooFinance.logger.setLevel(Level.OFF);
+        System.out.println(YahooFinance.CONNECTION_TIMEOUT);
+        Map<String, Stock> consulta = YahooFinance.get(ListaEmpresas.getListaDeEmpresas(), dataInicialTreinamento, dataFinalTreinamento, Interval.DAILY);
+
+        for (Map.Entry<String, Stock> entry : consulta.entrySet()) {
+            String simbolo = entry.getKey();
+            Stock value = entry.getValue();
+            
+            Company c = new Company(simbolo);
+            
+            c.setHistorico(value.getHistory());            
+            empresas.add(c);
+            
         }
+        
+        ta.
     }
 }

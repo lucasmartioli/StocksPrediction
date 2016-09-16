@@ -6,9 +6,7 @@
 package stocksprediction;
 
 import java.io.IOException;
-import yahoofinance.YahooFinance;
-import yahoofinance.histquotes.HistoricalQuote;
-import yahoofinance.histquotes.Interval;
+import treinamentoredes.TreinamentoRedes;
 
 /**
  *
@@ -23,9 +21,7 @@ public class StocksPrediction {
     public static void main(String[] args) throws IOException {
         
         
-        for ( HistoricalQuote arg : YahooFinance.get("ABEV3.SA",Interval.WEEKLY).getHistory()) {
-            System.out.println(arg.toString());           
-        }
+        TreinamentoRedes t = new TreinamentoRedes();
 
         
     }

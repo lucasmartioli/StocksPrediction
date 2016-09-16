@@ -7,12 +7,14 @@ package model;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
+import yahoofinance.histquotes.HistoricalQuote;
 
 /**
  *
  * @author Lucas
  */
  public class StockValues {
+    
 
         private Calendar date;
 
@@ -24,6 +26,15 @@ import java.util.Calendar;
         //private BigDecimal adjClose;
 
         private Long volume;
+        
+        public StockValues( HistoricalQuote h) {
+            this.date = h.getDate();
+            this.open = h.getOpen();
+            this.low  = h.getLow();
+            this.volume = h.getVolume();
+            this.high = h.getHigh();        
+            
+        }
 
         public Calendar getDate() {
             return date;
