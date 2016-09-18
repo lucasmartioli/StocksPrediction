@@ -12,6 +12,8 @@ import eu.verdelhan.ta4j.Tick;
 import eu.verdelhan.ta4j.TimeSeries;
 import eu.verdelhan.ta4j.indicators.simple.ClosePriceIndicator;
 import eu.verdelhan.ta4j.indicators.trackers.EMAIndicator;
+import eu.verdelhan.ta4j.indicators.trackers.MACDIndicator;
+import eu.verdelhan.ta4j.indicators.trackers.RSIIndicator;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
@@ -26,6 +28,7 @@ import java.math.BigDecimal;
 import java.util.Vector;
 import yahoofinance.histquotes.HistoricalQuote;
 import eu.verdelhan.ta4j.indicators.trackers.SMAIndicator;
+import eu.verdelhan.ta4j.indicators.volume.OnBalanceVolumeIndicator;
 import java.text.SimpleDateFormat;
 import java.time.Period;
 import java.util.ArrayList;
@@ -102,6 +105,9 @@ public class TreinamentoRedes {
         SMAIndicator sma = new SMAIndicator(closePrice, 4);
         SMAIndicator sma9 = new SMAIndicator(closePrice, 9);
         SMAIndicator sma18 = new SMAIndicator(closePrice, 18);
+        MACDIndicator macd = new MACDIndicator(closePrice, 12, 26);
+        RSIIndicator rsi = new RSIIndicator(closePrice, 14);
+        OnBalanceVolumeIndicator obv = new OnBalanceVolumeIndicator(serie);
         //sma.c;
 
         TimeSeriesCollection dataset = new TimeSeriesCollection();
@@ -109,6 +115,9 @@ public class TreinamentoRedes {
         dataset.addSeries(buildChartTimeSeries(serie, sma, "Média móvel Simples - 4 dias"));
         dataset.addSeries(buildChartTimeSeries(serie, sma9, "Média móvel Simples - 9 dias"));
         dataset.addSeries(buildChartTimeSeries(serie, sma18, "Média móvel Simples - 18 dias"));
+        //dataset.addSeries(buildChartTimeSeries(serie, macd, "MACD - 12 e 26 dias"));
+        //dataset.addSeries(buildChartTimeSeries(serie, rsi, "RSI - 14 dias"));
+        //dataset.addSeries(buildChartTimeSeries(serie, obv, "OBV"));
 
         /**
          * Creating the chart
