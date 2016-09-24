@@ -157,8 +157,9 @@ public class TrainingNeuralNetworks {
 
     private static void displayChart(JFreeChart chart) {
         
-//http://www.jfree.org/jfreechart/api/javadoc/org/jfree/chart/plot/CombinedDomainCategoryPlot.html
+        //http://www.jfree.org/jfreechart/api/javadoc/org/jfree/chart/plot/CombinedDomainCategoryPlot.html
         //http://www.java2s.com/Code/Java/Chart/JFreeChartCombinedCategoryPlotDemo1.htm
+        
         // Chart panel
         ChartPanel panel = new ChartPanel(chart);
         panel.setFillZoomRectangle(true);
@@ -170,6 +171,6 @@ public class TrainingNeuralNetworks {
         frame.setContentPane(panel);
         frame.pack();
         RefineryUtilities.centerFrameOnScreen(frame);
-        frame.setVisible(true);
+        //frame.setVisible(true);
     }
 }
