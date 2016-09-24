@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package treinamentoredes;
+package trainingneuralnetworks;
 
 import com.sun.media.jfxmedia.logging.Logger;
 import eu.verdelhan.ta4j.Decimal;
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import model.Company;
-import model.ListaEmpresas;
+import model.CompanyList;
 import yahoofinance.Stock;
 import yahoofinance.YahooFinance;
 import yahoofinance.histquotes.Interval;
@@ -48,13 +48,13 @@ import org.jfree.ui.RefineryUtilities;
  *
  * @author Lucas
  */
-public class TreinamentoRedes {
+public class TrainingNeuralNetworks {
 
     private static Calendar dataInicialTreinamento;
     private static Calendar dataFinalTreinamento;
     private static List<Company> empresas;
 
-    public TreinamentoRedes() throws IOException {
+    public TrainingNeuralNetworks() throws IOException {
 
 //c.macd(0, 0, inReal, 0, 0, 0, outBegIdx, outNBElement, outMACD, outMACDSignal, outMACDHist)
 //c.rsi(0, 0, inReal, 0, outBegIdx, outNBElement, outReal)
@@ -64,8 +64,8 @@ public class TreinamentoRedes {
         dataInicialTreinamento = Calendar.getInstance();
         dataInicialTreinamento.set(16, 2, 6);
 
-        dataFinalTreinamento = Calendar.getInstance();
-        dataFinalTreinamento.set(16, 8, 18);
+        dataFinalTreinamento = Calendar.getInstance();        
+        dataFinalTreinamento.set(16, 8, 20);
 
         this.carregaDadosHistoricosParaTreinamento();
 
@@ -91,7 +91,7 @@ public class TreinamentoRedes {
         for (int j = c.getHistorico().size() - 1; j > 0; j--) {
             HistoricalQuote hq = c.getHistorico().get(j);
 
-            DateTime d = new DateTime(hq.getDate().getTimeInMillis());
+            DateTime d = new DateTime(hq.getDate().getTimeInMillis());            
 //            Period periodo = new org.joda.time.Period
             Tick dado = new Tick(d, hq.getOpen().doubleValue(), hq.getHigh().doubleValue(), hq.getLow().doubleValue(), hq.getClose().doubleValue(), hq.getVolume());
             //dado.
@@ -156,6 +156,9 @@ public class TreinamentoRedes {
     }
 
     private static void displayChart(JFreeChart chart) {
+        
+//http://www.jfree.org/jfreechart/api/javadoc/org/jfree/chart/plot/CombinedDomainCategoryPlot.html
+        //http://www.java2s.com/Code/Java/Chart/JFreeChartCombinedCategoryPlotDemo1.htm
         // Chart panel
         ChartPanel panel = new ChartPanel(chart);
         panel.setFillZoomRectangle(true);
@@ -163,6 +166,7 @@ public class TreinamentoRedes {
         panel.setPreferredSize(new java.awt.Dimension(500, 270));
         // Application frame
         ApplicationFrame frame = new ApplicationFrame("Exemplo de Indicadores - PETR4");
+        
         frame.setContentPane(panel);
         frame.pack();
         RefineryUtilities.centerFrameOnScreen(frame);

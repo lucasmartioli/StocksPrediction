@@ -6,6 +6,7 @@
 package model;
 
 import java.util.List;
+import yahoofinance.Stock;
 import yahoofinance.histquotes.HistoricalQuote;
 
 /**
@@ -15,12 +16,14 @@ import yahoofinance.histquotes.HistoricalQuote;
 public class Company {
 
     private final String simbolo;
+    private StockValues valoresAutais;
+
     private List<HistoricalQuote> historico;
 
     public Company(String simbolo) {
         this.simbolo = simbolo;
     }
-
+    
     public List<HistoricalQuote> getHistorico() {
         return historico;
     }
@@ -31,5 +34,13 @@ public class Company {
 
     public String getSimbolo() {
         return simbolo;
+    }
+
+    public StockValues getValoresAutais() {
+        return valoresAutais;
+    }
+
+    public void setValoresAutais(StockValues valoresAutais) {
+        this.valoresAutais = valoresAutais;
     }
 }

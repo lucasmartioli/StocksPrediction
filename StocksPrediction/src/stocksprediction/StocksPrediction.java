@@ -6,7 +6,7 @@
 package stocksprediction;
 
 import java.io.IOException;
-import treinamentoredes.TreinamentoRedes;
+import trainingneuralnetworks.TrainingNeuralNetworks;
 
 /**
  *
@@ -19,7 +19,7 @@ public class StocksPrediction {
      */
     public static void main(String[] args) throws IOException {
 
-        TreinamentoRedes t = new TreinamentoRedes();
+        TrainingNeuralNetworks t = new TrainingNeuralNetworks();
 //        com.tictactec.ta.lib.Core c = new com.tictactec.ta.lib.Core();
 //        double[] ddd = {3, 10, 10, 10, 1, 10, 10, 10};
 //        MInteger outBagIdx = new MInteger();
