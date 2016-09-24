@@ -6,7 +6,7 @@
 package stocksprediction;
 
 import java.io.IOException;
-import trainingneuralnetworks.TrainingNeuralNetworks;
+import neuralnetworks.TrainingNeuralNetworks;
 
 /**
  *
