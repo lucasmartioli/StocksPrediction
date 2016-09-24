@@ -6,6 +6,11 @@
 package stocksprediction;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import loadingcompany.LoadingCompany;
+import model.Company;
 import neuralnetworks.NeuralNetworks;
 
 /**
@@ -18,6 +23,19 @@ public class StocksPrediction {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+
+        try {
+            Calendar di = Calendar.getInstance();
+            Calendar df = Calendar.getInstance();
+            di.set(16, 6, 1);
+            di.set(16, 8, 1);
+            
+            Company petrobras = LoadingCompany.loading("PETR4", di, df);
+            NeuralNetworks petrobrasNN = new NeuralNetworks(petrobras);
+            petrobrasNN.toPredict();
+        } catch (IOException ex) {
+            Logger.getLogger(TrainingNetworks.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         //NeuralNetworks t = new NeuralNetworks();
 //        com.tictactec.ta.lib.Core c = new com.tictactec.ta.lib.Core();
@@ -38,7 +56,6 @@ public class StocksPrediction {
 //            System.out.println(d);
 //            
 //        }
-
     }
 
 }

@@ -32,14 +32,14 @@ public class TechnicalIndicators {
         return maxDaysIndicators;
     }
 
-    private TimeSeries timeSeries;
-    private final ClosePriceIndicator closePrice = new ClosePriceIndicator(timeSeries);
-    private final SMAIndicator sma4days = new SMAIndicator(closePrice, 4);
-    private final SMAIndicator sma9days = new SMAIndicator(closePrice, 9);
-    private final SMAIndicator sma18days = new SMAIndicator(closePrice, 18);
-    private final MACDIndicator macd = new MACDIndicator(closePrice, 12, 26);
-    private final RSIIndicator rsi14days = new RSIIndicator(closePrice, 14);
-    private final OnBalanceVolumeIndicator obv = new OnBalanceVolumeIndicator(timeSeries);
+    private final TimeSeries timeSeries;
+    private final ClosePriceIndicator closePrice;
+    private final SMAIndicator sma4days;
+    private final SMAIndicator sma9days;
+    private final SMAIndicator sma18days;
+    private final MACDIndicator macd;
+    private final RSIIndicator rsi14days;
+    private final OnBalanceVolumeIndicator obv;
 
     public TechnicalIndicators(List<HistoricalQuote> historic) {
 
@@ -54,6 +54,13 @@ public class TechnicalIndicators {
         }
 
         this.timeSeries = new TimeSeries(tickList);
+        this.closePrice = new ClosePriceIndicator(timeSeries);
+        this.obv = new OnBalanceVolumeIndicator(timeSeries);
+        this.rsi14days = new RSIIndicator(closePrice, 14);
+        this.macd = new MACDIndicator(closePrice, 12, 26);
+        this.sma18days = new SMAIndicator(closePrice, 18);
+        this.sma9days = new SMAIndicator(closePrice, 9);
+        this.sma4days = new SMAIndicator(closePrice, 4);
 
     }
 

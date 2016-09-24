@@ -37,9 +37,9 @@ public class Company {
         return historic;
     }
 
-    public void setHistoric(List<HistoricalQuote> historic) {
-        this.calculateTechnicalIndicators();
+    public void setHistoric(List<HistoricalQuote> historic) {        
         this.historic = historic;
+        this.calculateTechnicalIndicators();
     }
 
     public String getSimbolo() {

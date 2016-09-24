@@ -21,6 +21,8 @@ import yahoofinance.histquotes.Interval;
  * @author Lucas
  */
 public class LoadingCompany {
+    
+    private static final String commonSuffix = ".SA";
 
     public static ArrayList<Company> loading(String[] listaEmpresas, Calendar dataInicial, Calendar dataFinal) throws IOException {
 
@@ -42,12 +44,12 @@ public class LoadingCompany {
         return empresas;
     }
 
-    public static Company loading(String empresa, Calendar dataInicial, Calendar dataFinal) throws IOException {
+    public static Company loading(String symbol, Calendar dataInicial, Calendar dataFinal) throws IOException {
 
         YahooFinance.logger.setLevel(Level.OFF);
-        Stock consulta = YahooFinance.get(empresa, dataInicial, dataFinal, Interval.DAILY);
+        Stock consulta = YahooFinance.get(symbol + commonSuffix, dataInicial, dataFinal, Interval.DAILY);
 
-        Company company = new Company(empresa);
+        Company company = new Company(symbol);
         company.setHistoric(consulta.getHistory());
 
         return company;
@@ -56,7 +58,7 @@ public class LoadingCompany {
     public static Company loading(String empresa) throws IOException {
 
         YahooFinance.logger.setLevel(Level.OFF);
-        Stock consulta = YahooFinance.get(empresa);
+        Stock consulta = YahooFinance.get(empresa + commonSuffix);
         
         StockValues sv = new StockValues(consulta);
  

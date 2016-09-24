@@ -29,9 +29,9 @@ import technicalindicators.TechnicalIndicators;
 public class NeuralNetworks {
     
     private final MultiLayerPerceptron neuralNetwork;
-    private final int inputLength = 12;
-    private final int interlayerLength = 25;
-    private final int outputLength = 7;
+    private final int inputLength = 7;
+    private final int interlayerLength = 15;
+    private final int outputLength = 1;
     private final int maxIterationsForLearning = 1000;
     private final double maxErrorForLearning = 0.00001;
     private final double learningRateForLearning = 0.8;
