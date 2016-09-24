@@ -35,7 +35,7 @@ public class LoadingCompany {
 
             Company company = new Company(simbolo);
 
-            company.setHistorico(value.getHistory());
+            company.setHistoric(value.getHistory());
             empresas.add(company);
         }
 
@@ -48,7 +48,7 @@ public class LoadingCompany {
         Stock consulta = YahooFinance.get(empresa, dataInicial, dataFinal, Interval.DAILY);
 
         Company company = new Company(empresa);
-        company.setHistorico(consulta.getHistory());
+        company.setHistoric(consulta.getHistory());
 
         return company;
     }

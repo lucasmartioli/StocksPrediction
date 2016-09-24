@@ -5,10 +5,16 @@
  */
 package neuralnetworks;
 
+import eu.verdelhan.ta4j.TimeSeries;
+import eu.verdelhan.ta4j.indicators.simple.ClosePriceIndicator;
+import eu.verdelhan.ta4j.indicators.trackers.MACDIndicator;
+import eu.verdelhan.ta4j.indicators.trackers.RSIIndicator;
+import eu.verdelhan.ta4j.indicators.trackers.SMAIndicator;
+import eu.verdelhan.ta4j.indicators.volume.OnBalanceVolumeIndicator;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Vector;
 import model.Company;
 
 import org.neuroph.core.NeuralNetwork;
@@ -16,54 +22,80 @@ import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.BackPropagation;
+import technicalindicators.TechnicalIndicators;
 
 /**
  *
  * @author Lucas
  */
-public class TrainingNeuralNetworks {
+public class NeuralNetworks {
 
     private final MultiLayerPerceptron neuralNetwork;
     private final int inputLength = 12;
     private final int interlayerLength = 25;
     private final int outputLength = 7;
     private final int maxIterationsForLearning = 1000;
-    private final double maxErrorForLearning = 0.0001;
+    private final double maxErrorForLearning = 0.00001;
     private final double learningRateForLearning = 0.8;
+    private final double minValueInSet = 0d;
+    private final double maxValueInSet = 1000d;
+    private final int daysForPredict = 7;
     private final String fileNameNeuralNetwork;
-    private static Calendar dataInicialTreinamento;
-    private static Calendar dataFinalTreinamento;
-    private static List<Company> empresas;
+    private final Company company;
 
-    public TrainingNeuralNetworks() throws IOException {
-
-        empresas = new Vector<>();
-        
-        fileNameNeuralNetwork = "tenhoquemudaressenome";
-
-        dataInicialTreinamento = Calendar.getInstance();
-        dataInicialTreinamento.set(16, 2, 6);
-
-        dataFinalTreinamento = Calendar.getInstance();
-        dataFinalTreinamento.set(16, 8, 20);
-
+    public NeuralNetworks(Company company) {
+        this.company = company;
+        fileNameNeuralNetwork = company.getSimbolo() + ".neuralnet";
         neuralNetwork = new MultiLayerPerceptron(inputLength, interlayerLength, outputLength);
-
-        this.carregaDadosHistoricosParaTreinamento();
-
     }
 
-    private void carregaDadosHistoricosParaTreinamento() throws IOException {
+    private List<DataSetRow> generateDataSetToTraining() {
+        List<DataSetRow> dataSet = new ArrayList<>();
 
+        TechnicalIndicators technicalIndicators = company.getTechnicalIndicators();
+        TimeSeries timeSeries = technicalIndicators.getTimeSeries();
+
+        for (int i = TechnicalIndicators.getMaxDaysIndicators(); i < timeSeries.getTickCount() - daysForPredict; i++) {
+
+            ClosePriceIndicator closePriceIndicator = technicalIndicators.getClosePrice();
+            MACDIndicator macd = technicalIndicators.getMacd();
+            RSIIndicator rsi14days = technicalIndicators.getRsi14days();
+            SMAIndicator sma4days = technicalIndicators.getSma4days();
+            SMAIndicator sma9days = technicalIndicators.getSma9days();
+            SMAIndicator sma18days = technicalIndicators.getSma18days();
+            OnBalanceVolumeIndicator obv = technicalIndicators.getObv();
+            double[] input
+                    = { normalizeValue(closePriceIndicator.getValue(i).toDouble()),
+                        normalizeValue(macd.getValue(i).toDouble()),
+                        normalizeValue(rsi14days.getValue(i).toDouble()),
+                        normalizeValue(sma4days.getValue(i).toDouble()),
+                        normalizeValue(sma9days.getValue(i).toDouble()),
+                        normalizeValue(sma18days.getValue(i).toDouble()),
+                        normalizeValue(obv.getValue(i).toDouble())};
+            double[] output = {normalizeValue(closePriceIndicator.getValue(i + daysForPredict).toDouble())};
+            DataSetRow row = new DataSetRow(input, output);
+            dataSet.add(row);
+        }
+
+        return dataSet;
     }
 
-    public void toTrain(List<DataSetRow> dataSet) {
+    double normalizeValue(double input) {
+        return (input - minValueInSet) / (maxValueInSet - minValueInSet) * 0.8d + 0.1d;
+    }
+
+    double deNormalizeValue(double input) {
+        return minValueInSet + (input - 0.1d) * (maxValueInSet - minValueInSet) / 0.8d;
+    }
+
+    public void toTrain() {
+        List<DataSetRow> dataSet = generateDataSetToTraining();
         neuralNetwork.randomizeWeights();
         BackPropagation learningRules = new BackPropagation();
         learningRules.setMaxIterations(maxIterationsForLearning);
         learningRules.setMaxError(maxErrorForLearning);
         learningRules.setLearningRate(learningRateForLearning);
-        
+
         DataSet trainingSet;
         trainingSet = new DataSet(inputLength, outputLength);
         for (DataSetRow row : dataSet) {
@@ -75,7 +107,7 @@ public class TrainingNeuralNetworks {
 
     }
 }
-    
+
 /*
 public final class RedeNeural {
 
@@ -131,4 +163,4 @@ public final class RedeNeural {
 }
 
 }
-*/
+ */

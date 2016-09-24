@@ -19,7 +19,7 @@ public class Company {
     private TechnicalIndicators technicalIndicators;
     private StockValues valoresAutais;
 
-    private List<HistoricalQuote> historico;
+    private List<HistoricalQuote> historic;
 
     public Company(String simbolo) {
         this.simbolo = simbolo;
@@ -30,16 +30,16 @@ public class Company {
     }
 
     public void calculateTechnicalIndicators() {
-        this.technicalIndicators = new TechnicalIndicators(historico);
+        this.technicalIndicators = new TechnicalIndicators(historic);
     }
 
-    public List<HistoricalQuote> getHistorico() {
-        return historico;
+    public List<HistoricalQuote> getHistoric() {
+        return historic;
     }
 
-    public void setHistorico(List<HistoricalQuote> historico) {
+    public void setHistoric(List<HistoricalQuote> historic) {
         this.calculateTechnicalIndicators();
-        this.historico = historico;
+        this.historic = historic;
     }
 
     public String getSimbolo() {

@@ -84,12 +84,12 @@ public class Test {
         Company c = new Company("PETR4");
 
         //System.out.println(consulta.getHistory().t());
-        c.setHistorico(consulta.getHistory());
+        c.setHistoric(consulta.getHistory());
         empresas.add(c);
 
         ArrayList<Tick> serieTemporal = new ArrayList<>();
-        for (int j = c.getHistorico().size() - 1; j > 0; j--) {
-            HistoricalQuote hq = c.getHistorico().get(j);
+        for (int j = c.getHistoric().size() - 1; j > 0; j--) {
+            HistoricalQuote hq = c.getHistoric().get(j);
 
             DateTime d = new DateTime(hq.getDate().getTimeInMillis());            
 //            Period periodo = new org.joda.time.Period

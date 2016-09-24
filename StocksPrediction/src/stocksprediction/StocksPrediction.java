@@ -6,7 +6,7 @@
 package stocksprediction;
 
 import java.io.IOException;
-import neuralnetworks.TrainingNeuralNetworks;
+import neuralnetworks.NeuralNetworks;
 
 /**
  *
@@ -17,9 +17,9 @@ public class StocksPrediction {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
-        TrainingNeuralNetworks t = new TrainingNeuralNetworks();
+        //NeuralNetworks t = new NeuralNetworks();
 //        com.tictactec.ta.lib.Core c = new com.tictactec.ta.lib.Core();
 //        double[] ddd = {3, 10, 10, 10, 1, 10, 10, 10};
 //        MInteger outBagIdx = new MInteger();
