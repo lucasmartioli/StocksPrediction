@@ -35,23 +35,24 @@ import technicalindicators.TechnicalIndicators;
 public class NeuralNetworks {
 
     private final MultiLayerPerceptron neuralNetwork;
-    private final int inputLength = 14;
-    private final int interlayerLength = 29;
+    private final int inputLength = 9;
+    private final int interlayerLength = 2 * inputLength + 1;
     private final int outputLength = 1;
-    private final int maxIterationsForLearning = 4000;
-    private final double maxErrorForLearning = 0.0001;
+    private final int maxIterationsForLearning = 1000;
+    private final double maxErrorForLearning = 0.00001;
     private final double learningRateForLearning = 0.5;
     private double[] minValueInSet;
     private double[] maxValueInSet;
-    private final int daysForPredict = 5;
+    private final int tradesForPredict = 1;
     private final String fileNameNeuralNetwork;
     private final Company company;
-    private double denorma;
+    private double maxValueToDeNormalize;
+    private double minValueToDeNormalize;
 
     public NeuralNetworks(Company company) {
         this.company = company;
         fileNameNeuralNetwork = company.getSimbolo() + ".neuralnet";
-        neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, inputLength, interlayerLength,interlayerLength,  outputLength);
+        neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, inputLength, interlayerLength, outputLength);
 
         foundMinAndMaxInSet();
     }
@@ -80,30 +81,36 @@ public class NeuralNetworks {
                 //                normalizeValue(closePriceIndicator.getValue(index - 2).toDouble(), IndexMinAndMaxInSet.PRICE),
                 //                    normalizeValue(closePriceIndicator.getValue(index - 1).toDouble(), IndexMinAndMaxInSet.PRICE),
                 //                    normalizeValue(closePriceIndicator.getValue(index).toDouble(), IndexMinAndMaxInSet.PRICE),
-                = {normalizeValue(sma4days.getValue(index).toDouble(), IndexMinAndMaxInSet.PRICE),
-                    normalizeValue(sma4days.getValue(index - 1).toDouble(), IndexMinAndMaxInSet.PRICE),
+                = {normalizeValue(closePriceIndicator.getValue(index).toDouble(), IndexMinAndMaxInSet.PRICE),
+                    normalizeValue(closePriceIndicator.getValue(index - 2 ).toDouble(), IndexMinAndMaxInSet.PRICE),
+                    normalizeValue(closePriceIndicator.getValue(index - 5 ).toDouble(), IndexMinAndMaxInSet.PRICE),
+                    normalizeValue(sma4days.getValue(index).toDouble(), IndexMinAndMaxInSet.PRICE),
                     normalizeValue(sma4days.getValue(index - 2).toDouble(), IndexMinAndMaxInSet.PRICE),
-                    normalizeValue(sma9days.getValue(index).toDouble(), IndexMinAndMaxInSet.PRICE),
-                    normalizeValue(sma9days.getValue(index - 1).toDouble(), IndexMinAndMaxInSet.PRICE),
-                    normalizeValue(sma9days.getValue(index - 2).toDouble(), IndexMinAndMaxInSet.PRICE),
-                    normalizeValue(sma18days.getValue(index).toDouble(), IndexMinAndMaxInSet.PRICE),
-                    normalizeValue(sma18days.getValue(index - 1).toDouble(), IndexMinAndMaxInSet.PRICE),
-                    normalizeValue(sma18days.getValue(index - 2).toDouble(), IndexMinAndMaxInSet.PRICE),
-                    normalizePercentage(rsi14days.getValue(index).toDouble()),                    
-                    normalizeValue(macd.getValue(index).toDouble(), IndexMinAndMaxInSet.MACD),
-                    normalizeValue(macd.getValue(index - 1).toDouble(), IndexMinAndMaxInSet.MACD),
-                    normalizeValue(macd.getValue(index - 2).toDouble(), IndexMinAndMaxInSet.MACD),
-                    normalizeValue(obv.getValue(index).toDouble(), IndexMinAndMaxInSet.VOLUME)};
-        
+                    normalizeValue(sma4days.getValue(index - 5).toDouble(), IndexMinAndMaxInSet.PRICE),
+                    normalizePercentage(rsi14days.getValue(index).toDouble()),
+                    normalizePercentage(rsi14days.getValue(index - 2).toDouble()),
+                    normalizePercentage(rsi14days.getValue(index - 5).toDouble())};
+//                    normalizeValue(sma9days.getValue(index).toDouble(), IndexMinAndMaxInSet.PRICE),
+//                    normalizeValue(sma9days.getValue(index - 2).toDouble(), IndexMinAndMaxInSet.PRICE),
+//                    normalizeValue(sma9days.getValue(index - 5).toDouble(), IndexMinAndMaxInSet.PRICE),
+//                    normalizeValue(sma18days.getValue(index).toDouble(), IndexMinAndMaxInSet.PRICE),
+//                    normalizeValue(sma18days.getValue(index - 2).toDouble(), IndexMinAndMaxInSet.PRICE),
+//                    normalizeValue(sma18days.getValue(index - 5).toDouble(), IndexMinAndMaxInSet.PRICE),
+//                    
+//                    normalizeValue(macd.getValue(index).toDouble(), IndexMinAndMaxInSet.MACD),
+//                    normalizeValue(macd.getValue(index - 2).toDouble(), IndexMinAndMaxInSet.MACD),
+//                    normalizeValue(macd.getValue(index - 5).toDouble(), IndexMinAndMaxInSet.MACD),
+//                    normalizeValue(obv.getValue(index).toDouble(), IndexMinAndMaxInSet.VOLUME)};
+
         return input;
 
     }
 
     private double[] getExpectedOutpuToNeuralNetwork(TechnicalIndicators technicalIndicators, int index) {
         ClosePriceIndicator closePriceIndicator = technicalIndicators.getClosePrice();
-        System.out.println(closePriceIndicator.getTimeSeries().getTick(index + daysForPredict).getDateName() + " " + daysForPredict + " DIAS " + closePriceIndicator.getValue(index + daysForPredict).toDouble());
+        System.out.println(closePriceIndicator.getTimeSeries().getTick(index + tradesForPredict).getDateName() + " " + tradesForPredict + " DIAS " + closePriceIndicator.getValue(index + tradesForPredict).toDouble());
         double[] output
-                = {normalizeValue(closePriceIndicator.getValue(index + daysForPredict).toDouble(), IndexMinAndMaxInSet.PRICE)};
+                = {normalizeValue(closePriceIndicator.getValue(index + tradesForPredict).toDouble(), IndexMinAndMaxInSet.PRICE)};
         return output;
     }
 
@@ -113,7 +120,7 @@ public class NeuralNetworks {
         TechnicalIndicators technicalIndicators = company.getTechnicalIndicators();
         TimeSeries timeSeries = technicalIndicators.getTimeSeries();
 
-        for (int i = TechnicalIndicators.getMaxDaysIndicators(); i < (timeSeries.getTickCount() - 1) - daysForPredict; i++) {
+        for (int i = TechnicalIndicators.getMaxDaysIndicators(); i < (timeSeries.getTickCount() - 1) - tradesForPredict; i++) {
             DataSetRow row = new DataSetRow(getInputToNeuralNetwork(technicalIndicators, i), getExpectedOutpuToNeuralNetwork(technicalIndicators, i));
             dataSet.add(row);
         }
@@ -123,15 +130,15 @@ public class NeuralNetworks {
 
     double normalizeValue(double input, IndexMinAndMaxInSet index) {
         System.out.println("VALOR MÁXIMO " + maxValueInSet[index.getIndex()]);
+        System.out.println("VALOR MINIMO " + minValueInSet[index.getIndex()]);
 
         return input / maxValueInSet[index.getIndex()];
-//        return value/*maxValueInSet[index.getIndex()]*/;
-        //return (inputRounded - minValueInSet[index.getIndex()]) / (maxValueInSet[index.getIndex()] - minValueInSet[index.getIndex()]) * 0.8d + 0.1d;
+//        return (input - minValueInSet[index.getIndex()]) / (maxValueInSet[index.getIndex()] + 0.1D - minValueInSet[index.getIndex()]) ;
     }
 
     double deNormalizeValue(double input, IndexMinAndMaxInSet index) {
-//        System.out.println("dsdwsd" + maxValueInSet[index.getIndex()]);
-        return input * denorma/*maxValueInSet[index.getIndex()]*/;
+        return input * maxValueToDeNormalize;
+//        return minValueToDeNormalize + input * (maxValueToDeNormalize + 0.1D - minValueToDeNormalize);
     }
 
     public void toTrain() {
@@ -159,8 +166,9 @@ public class NeuralNetworks {
 
     }
 
-    public double toPredict(double v) {
-        denorma = v;
+    public double toPredict(double a, double b) {
+        maxValueToDeNormalize = a;
+        minValueToDeNormalize = b;
 
         TechnicalIndicators technicalIndicators = company.getTechnicalIndicators();
         TimeSeries timeSeries = technicalIndicators.getTimeSeries();
@@ -202,8 +210,8 @@ public class NeuralNetworks {
             MACDIndicator macd = technicalIndicators.getMacd();
 
             double priceValue = closePriceIndicator.getValue(i).toDouble();
-            double volumeValue = obv.getValue(i).toDouble();
-            double macdValue = macd.getValue(i).toDouble();
+            double volumeValue = Math.abs(obv.getValue(i).toDouble());
+            double macdValue = Math.abs(macd.getValue(i).toDouble());
 
             //System.out.println("DATA " + closePriceIndicator.getTimeSeries().getTick(i).getDateName() + " PRICE: " + priceValue + " VOLUME: " + volumeValue + " MACD: " + macdValue);
             if (priceValue < minValueInSet[IndexMinAndMaxInSet.PRICE.getIndex()]) {
@@ -250,6 +258,7 @@ public class NeuralNetworks {
     }
 
     private double normalizePercentage(double input) {
+        System.out.println("RSI: " + input / 100d);
         return input / 100d;
     }
 
