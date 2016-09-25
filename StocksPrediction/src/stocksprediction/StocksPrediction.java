@@ -37,7 +37,7 @@ public class StocksPrediction {
             Company petrobras;
             NeuralNetworks petrobrasNN;
 
-            for (int i = 0; i < 1; i++) {
+            for (int i = 0; i < 10; i++) {
                 
                 df.set(16, 8, 1 + i, 12, 0, 0);                      
                 di.setTimeInMillis(df.getTimeInMillis());
@@ -45,16 +45,16 @@ public class StocksPrediction {
                 di.add(Calendar.DAY_OF_MONTH, -200);
                 dfuturo.add(Calendar.DAY_OF_MONTH, 7);
                         
-                DateTime d2 = new DateTime(di.getTimeInMillis(), DateTimeZone.UTC);                
-                DateTime d3 = new DateTime(dfuturo.getTimeInMillis(), DateTimeZone.UTC);                
-                DateTime d = new DateTime(df.getTimeInMillis(), DateTimeZone.UTC);                
+                DateTime d2 = new DateTime(di.getTimeInMillis());                
+                DateTime d3 = new DateTime(dfuturo.getTimeInMillis());                
+                DateTime d = new DateTime(df.getTimeInMillis());                
                 System.out.println(d2.toString());
                 System.out.println(d.toString());
                 System.out.println(d3.toString());
-                petrobras = LoadingCompany.loading("PETR4", di, df);
+                petrobras = LoadingCompany.loading("PETR3", di, df);
 
                 petrobrasNN = new NeuralNetworks(petrobras);
-                petrobrasNN.toPredict(24.56d);
+                petrobrasNN.toPredict(15.66d);
 
             }
 

@@ -24,11 +24,11 @@ public class TrainingNetworks {
 
         try {
             Calendar di = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
-            di.set(14, 5, 1, 12, 0);
+            di.set(15, 0, 1, 12, 0);
             Calendar df = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
-            df.set(16, 6, 1, 12, 0);
+            df.set(16, 8, 1, 12, 0);
 
-            Company petrobras = LoadingCompany.loading("PETR4", di, df);
+            Company petrobras = LoadingCompany.loading("PETR3", di, df);
             NeuralNetworks petrobrasNN = new NeuralNetworks(petrobras);
             petrobrasNN.toTrain();
         } catch (IOException ex) {
