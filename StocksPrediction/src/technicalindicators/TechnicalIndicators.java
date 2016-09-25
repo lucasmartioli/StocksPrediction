@@ -26,7 +26,7 @@ import org.joda.time.DateTime;
  */
 public class TechnicalIndicators {
 
-    static final int maxDaysIndicators = 26;
+    static final int maxDaysIndicators = 30;
 
     public static int getMaxDaysIndicators() {
         return maxDaysIndicators;

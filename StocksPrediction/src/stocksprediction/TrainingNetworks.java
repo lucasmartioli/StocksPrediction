@@ -24,9 +24,9 @@ public class TrainingNetworks {
 
         try {
             Calendar di = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
-            di.set(13, 5, 1);
+            di.set(14, 5, 1, 12, 0);
             Calendar df = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
-            df.set(15, 6, 1);
+            df.set(16, 6, 1, 12, 0);
 
             Company petrobras = LoadingCompany.loading("PETR4", di, df);
             NeuralNetworks petrobrasNN = new NeuralNetworks(petrobras);

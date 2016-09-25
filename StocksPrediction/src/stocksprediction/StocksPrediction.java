@@ -37,12 +37,12 @@ public class StocksPrediction {
             Company petrobras;
             NeuralNetworks petrobrasNN;
 
-            for (int i = 1; i < 10; i++) {
+            for (int i = 0; i < 1; i++) {
                 
-                df.set(16, 8, 10 + i, 0, 0, 0);                      
+                df.set(16, 8, 1 + i, 12, 0, 0);                      
                 di.setTimeInMillis(df.getTimeInMillis());
                 dfuturo.setTimeInMillis(df.getTimeInMillis());
-                di.add(Calendar.DAY_OF_MONTH, -2000);
+                di.add(Calendar.DAY_OF_MONTH, -200);
                 dfuturo.add(Calendar.DAY_OF_MONTH, 7);
                         
                 DateTime d2 = new DateTime(di.getTimeInMillis(), DateTimeZone.UTC);                
@@ -54,7 +54,7 @@ public class StocksPrediction {
                 petrobras = LoadingCompany.loading("PETR4", di, df);
 
                 petrobrasNN = new NeuralNetworks(petrobras);
-                petrobrasNN.toPredict();
+                petrobrasNN.toPredict(24.56d);
 
             }
 
@@ -62,25 +62,7 @@ public class StocksPrediction {
             Logger.getLogger(TrainingNetworks.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        //NeuralNetworks t = new NeuralNetworks();
-//        com.tictactec.ta.lib.Core c = new com.tictactec.ta.lib.Core();
-//        double[] ddd = {3, 10, 10, 10, 1, 10, 10, 10};
-//        MInteger outBagIdx = new MInteger();
-//        MInteger outNBElement = new MInteger();                
-//        double[] outReal = new double[60];
-//        
-//        c.movingAverage(0, (ddd.length - 1), ddd, 2, MAType.Tema, outBagIdx, outNBElement, outReal);
-//        System.out.println(ddd.length);
-//        System.out.println(outReal.length);
-//        System.out.println("BAG " + outBagIdx.value);
-//        System.out.println(outNBElement.value);
-//        int n = 0;
-//        for (double d : outReal) {
-//            n++;
-//            System.out.print("id: " + n + " ");
-//            System.out.println(d);
-//            
-//        }
+       
     }
 
 }
