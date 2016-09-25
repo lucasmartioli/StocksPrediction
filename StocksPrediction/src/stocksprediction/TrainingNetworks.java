@@ -7,6 +7,7 @@ package stocksprediction;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import loadingcompany.LoadingCompany;
@@ -22,12 +23,12 @@ public class TrainingNetworks {
     public static void main(String[] args) {
 
         try {
-            Calendar di = Calendar.getInstance();
-            di.set(14, 0, 1);
-            Calendar df = Calendar.getInstance();
-            df.set(16, 0, 1);
-            
-            Company petrobras = LoadingCompany.loading("PETR4",di,df);
+            Calendar di = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
+            di.set(13, 5, 1);
+            Calendar df = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
+            df.set(15, 6, 1);
+
+            Company petrobras = LoadingCompany.loading("PETR4", di, df);
             NeuralNetworks petrobrasNN = new NeuralNetworks(petrobras);
             petrobrasNN.toTrain();
         } catch (IOException ex) {

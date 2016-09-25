@@ -48,6 +48,7 @@ public class LoadingCompany {
 
         YahooFinance.logger.setLevel(Level.OFF);
         Stock consulta = YahooFinance.get(symbol + commonSuffix, dataInicial, dataFinal, Interval.DAILY);
+        
 
         Company company = new Company(symbol);
         company.setHistoric(consulta.getHistory());

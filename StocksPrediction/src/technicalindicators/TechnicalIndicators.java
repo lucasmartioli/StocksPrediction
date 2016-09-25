@@ -54,6 +54,7 @@ public class TechnicalIndicators {
         }
 
         this.timeSeries = new TimeSeries(tickList);
+        
         this.closePrice = new ClosePriceIndicator(timeSeries);
         this.obv = new OnBalanceVolumeIndicator(timeSeries);
         this.rsi14days = new RSIIndicator(closePrice, 14);
