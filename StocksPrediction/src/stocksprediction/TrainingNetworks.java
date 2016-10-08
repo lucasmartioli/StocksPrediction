@@ -12,7 +12,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import loadingcompany.LoadingCompany;
 import model.Company;
-import neuralnetworks.NeuralNetworks;
+import neuralnetworks.PredictionNeuralNetwork;
+import neuralnetworks.TrainingNeuralNetwork;
 
 /**
  *
@@ -28,9 +29,9 @@ public class TrainingNetworks {
             Calendar df = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
             df.set(16, 8, 1, 12, 0);
 
-            Company petrobras = LoadingCompany.loading("VIVT4", di, df);
-            NeuralNetworks petrobrasNN = new NeuralNetworks(petrobras);
-            petrobrasNN.toTrain();
+            Company copel = LoadingCompany.loading("CPLE6", di, df);
+            TrainingNeuralNetwork.toTrain(copel);
+            
         } catch (IOException ex) {
             Logger.getLogger(TrainingNetworks.class.getName()).log(Level.SEVERE, null, ex);
         }

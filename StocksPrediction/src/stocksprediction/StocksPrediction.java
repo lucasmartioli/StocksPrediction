@@ -14,7 +14,8 @@ import java.util.logging.Logger;
 import loadingcompany.LoadingCompany;
 import model.Company;
 import model.CompanyList;
-import neuralnetworks.NeuralNetworks;
+import neuralnetworks.PredictionNeuralNetwork;
+import neuralnetworks.TrainingNeuralNetwork;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -35,12 +36,12 @@ public class StocksPrediction {
             Calendar dfuturo = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
             
 
-            Company petrobras;
-            NeuralNetworks petrobrasNN;
+            Company copel;
+            PredictionNeuralNetwork copelNet;
 
-            for (int i = 0; i < 1; i++) {
+            for (int i = 0; i < 15; i++) {
                 
-                df.set(16, 7, 11 + i, 12, 0, 0);                      
+                df.set(16, 8, 6 + i, 12, 0, 0);                      
                 di.setTimeInMillis(df.getTimeInMillis());
                 dfuturo.setTimeInMillis(df.getTimeInMillis());
                 di.add(Calendar.DAY_OF_MONTH, -200);
@@ -56,10 +57,9 @@ public class StocksPrediction {
 //                for (int j = 0; j < CompanyList.getNumeroTotalDeEmpresas(); j++) {
 //                    
 //                }
-                petrobras = LoadingCompany.loading("VIVT4", di, df);
-
-                petrobrasNN = new NeuralNetworks(petrobras);
-                petrobrasNN.toPredict(52.1821d, 32.3d);
+                copel = LoadingCompany.loading("CPLE6", di, df);
+                
+                System.out.println(TrainingNeuralNetwork.toPredict(copel));              
 
             }
 
