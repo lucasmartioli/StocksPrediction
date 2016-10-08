@@ -86,7 +86,7 @@ public class PredictionNeuralNetwork {
     }
 
     public void toTrain(List<DataSetRow> dataSet) {
-        System.out.println("Aqui");
+        System.out.println("Iniciando treinamento da rede " + fileNameNeuralNetwork);
         WeightsRandomizer randomizer = new WeightsRandomizer();
         Random random = new Random(Calendar.getInstance().getTimeInMillis());
         randomizer.setRandomGenerator(random);
@@ -102,20 +102,23 @@ public class PredictionNeuralNetwork {
         DataSet trainingSet;
         trainingSet = new DataSet(inputLength, outputLength);
         for (DataSetRow row : dataSet) {
+            System.out.println(row.toString());
             trainingSet.addRow(row);
         }
 
         neuralNetwork.learn(trainingSet, learningRules);
         neuralNetwork.save(fileNameNeuralNetwork);
+        System.out.println("Rede " + fileNameNeuralNetwork + " salva em arquivo.");
     }
 
     public double[] toPredict(double[] input) {
+        System.out.println("Iniciando uso da rede " + fileNameNeuralNetwork + "." );
         NeuralNetwork neuralNetworkLoad;
         neuralNetworkLoad = NeuralNetwork.createFromFile(fileNameNeuralNetwork);
         neuralNetworkLoad.setInput(input);
         neuralNetworkLoad.calculate();
 
-        System.out.println(fileNameNeuralNetwork + "");
+        
         System.out.print("entrada: ");
 
         for (double d : input) {
@@ -130,6 +133,11 @@ public class PredictionNeuralNetwork {
             System.out.print(d + ", ");
 
         }
+        
+        System.out.println("");
+        System.out.println("Finalizado o uso da rede " + fileNameNeuralNetwork + "." );
+        
         return neuralNetworkLoad.getOutput();
+        
     }
 }
