@@ -25,11 +25,11 @@ public class TrainingNetworks {
 
         try {
             Calendar di = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
-            di.set(14, 0, 1, 12, 0);
+            di.set(14, 5, 1, 12, 0);
             Calendar df = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
             df.set(16, 0, 1, 12, 0);
 
-            Company vivo = LoadingCompany.loading("VIVT3", di, df);
+            Company vivo = LoadingCompany.loading("VIVT4", di, df);
             TrainingNeuralNetwork.toTrain(vivo);
             
         } catch (IOException ex) {

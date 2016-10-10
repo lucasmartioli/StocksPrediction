@@ -7,6 +7,7 @@ package neuralnetworks;
 
 import eu.verdelhan.ta4j.TimeSeries;
 import eu.verdelhan.ta4j.indicators.simple.ClosePriceIndicator;
+import eu.verdelhan.ta4j.indicators.trackers.EMAIndicator;
 import eu.verdelhan.ta4j.indicators.trackers.MACDIndicator;
 import eu.verdelhan.ta4j.indicators.trackers.RSIIndicator;
 import eu.verdelhan.ta4j.indicators.trackers.SMAIndicator;
@@ -24,7 +25,10 @@ import technicalindicators.TechnicalIndicators;
  */
 public class TrainingNeuralNetwork {
 
-    private static final int tradesForTraining = 5;
+    private static final int tradesForTraining = 1;
+    private static final double INDICATIVO_TENDENCIA_ALTA = 1d;
+    private static final double INDICATIVO_TENDENCIA_BAIXA = 0d;
+    private static final double INDICATIVO_TENDENCIA_LATERAL = 0.5d;
 
     public static void toTrain(Company company) {
         TechnicalIndicators technicalIndicators = company.getTechnicalIndicators();
@@ -32,61 +36,79 @@ public class TrainingNeuralNetwork {
 
         PredictionNeuralNetwork rsiNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "RSI", 3, 1, TransferFunctionType.SIGMOID);
         rsiNeuralNetwork.setLearningRateForLearning(0.8d);
-        rsiNeuralNetwork.setMaxErrorForLearning(0.00001d);
-        rsiNeuralNetwork.setMaxIterationsForLearning(10000);
+        rsiNeuralNetwork.setMaxErrorForLearning(0d);
+        rsiNeuralNetwork.setMaxIterationsForLearning(4000);
         rsiNeuralNetwork.toTrain(getRSIDataSetTraining(timeSeries, technicalIndicators));
 
         PredictionNeuralNetwork smaNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "SMA", 3, 1, TransferFunctionType.SIGMOID);
         smaNeuralNetwork.setLearningRateForLearning(0.8d);
-        smaNeuralNetwork.setMaxErrorForLearning(0.00001d);
-        smaNeuralNetwork.setMaxIterationsForLearning(10000);
+        smaNeuralNetwork.setMaxErrorForLearning(0d);
+        smaNeuralNetwork.setMaxIterationsForLearning(4000);
         smaNeuralNetwork.toTrain(getSMADataSetTraining(timeSeries, technicalIndicators));
+
+        PredictionNeuralNetwork macdNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "MACD", 3, 1, TransferFunctionType.SIGMOID);
+        macdNeuralNetwork.setLearningRateForLearning(0.8d);
+        macdNeuralNetwork.setMaxErrorForLearning(0d);
+        macdNeuralNetwork.setMaxIterationsForLearning(4000);
+        macdNeuralNetwork.toTrain(getMACDDataSetTraining(timeSeries, technicalIndicators));
+
+        PredictionNeuralNetwork obvNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "OBV", 1, 1, TransferFunctionType.SIGMOID);
+        obvNeuralNetwork.setLearningRateForLearning(0.8d);
+        obvNeuralNetwork.setMaxErrorForLearning(0.001d);
+        obvNeuralNetwork.setMaxIterationsForLearning(1000);
+        //obvNeuralNetwork.toTrain(getOBVDataSetTraining(timeSeries, technicalIndicators));
 
         rsiNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "RSI");
         smaNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "SMA");
+        macdNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "MACD");
+        obvNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "OBV");
 
-        PredictionNeuralNetwork prediction = new PredictionNeuralNetwork(company.getSimbolo(), "PREDICTION", 4, 1, TransferFunctionType.SIGMOID);
-        prediction.setLearningRateForLearning(0.5d);
-        prediction.setMaxErrorForLearning(0.0001d);
-        prediction.setMaxIterationsForLearning(10000);
-        prediction.toTrain(getPREDICTIONDataSetTraining(timeSeries, technicalIndicators, rsiNeuralNetwork, smaNeuralNetwork));
+        PredictionNeuralNetwork prediction = new PredictionNeuralNetwork(company.getSimbolo(), "PREDICTION", 6, 1, TransferFunctionType.SIGMOID);
+        prediction.setLearningRateForLearning(0.8d);
+        prediction.setMaxErrorForLearning(0d);
+        prediction.setMaxIterationsForLearning(4000);
+        prediction.toTrain(getPREDICTIONDataSetTraining(timeSeries, technicalIndicators, rsiNeuralNetwork, smaNeuralNetwork, macdNeuralNetwork));
     }
 
     public static double toPredict(Company company) {
         TechnicalIndicators technicalIndicators = company.getTechnicalIndicators();
         TimeSeries timeSeries = technicalIndicators.getTimeSeries();
 
+        PredictionNeuralNetwork macdNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "MACD");
         PredictionNeuralNetwork rsiNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "RSI");
         PredictionNeuralNetwork smaNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "SMA");
+        PredictionNeuralNetwork obvNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "OBV");
         PredictionNeuralNetwork prediction = new PredictionNeuralNetwork(company.getSimbolo(), "PREDICTION");
 
-        double[] result = prediction.toPredict(getInputToPREDICTIONNeuralNetwork(rsiNeuralNetwork, smaNeuralNetwork, technicalIndicators, timeSeries.getTickCount() - 1));
+        double[] result = prediction.toPredict(getInputToPREDICTIONNeuralNetwork(macdNeuralNetwork, rsiNeuralNetwork, smaNeuralNetwork, technicalIndicators, timeSeries.getTickCount() - 1));
 
         return result[0];
     }
 
-    private static List<DataSetRow> getPREDICTIONDataSetTraining(TimeSeries timeSeries, TechnicalIndicators technicalIndicators, PredictionNeuralNetwork rsiNeuralNetwork, PredictionNeuralNetwork smaNeuralNetwork) {
+    private static List<DataSetRow> getPREDICTIONDataSetTraining(TimeSeries timeSeries, TechnicalIndicators technicalIndicators, PredictionNeuralNetwork rsiNeuralNetwork, PredictionNeuralNetwork smaNeuralNetwork, PredictionNeuralNetwork macdNeuralNetwork) {
 
         List<DataSetRow> predictionDataSet = new ArrayList<>();
         for (int i = TechnicalIndicators.getMaxDaysIndicators(); i < (timeSeries.getTickCount() - 1) - tradesForTraining; i++) {
-            DataSetRow row = new DataSetRow(TrainingNeuralNetwork.getInputToPREDICTIONNeuralNetwork(rsiNeuralNetwork, smaNeuralNetwork, technicalIndicators, i), TrainingNeuralNetwork.getExpectedOutpuToPREDICTIONNeuralNetwork(technicalIndicators, i));
+            DataSetRow row = new DataSetRow(TrainingNeuralNetwork.getInputToPREDICTIONNeuralNetwork(macdNeuralNetwork, rsiNeuralNetwork, smaNeuralNetwork, technicalIndicators, i), TrainingNeuralNetwork.getExpectedOutpuToPREDICTIONNeuralNetwork(technicalIndicators, i));
             predictionDataSet.add(row);
         }
 
         return predictionDataSet;
     }
 
-    private static double[] getInputToPREDICTIONNeuralNetwork(PredictionNeuralNetwork rsiNeuralNetwork, PredictionNeuralNetwork smaNeuralNetwork, TechnicalIndicators technicalIndicators, int index) {
+    private static double[] getInputToPREDICTIONNeuralNetwork(PredictionNeuralNetwork macdNeuralNetwork, PredictionNeuralNetwork rsiNeuralNetwork, PredictionNeuralNetwork smaNeuralNetwork, TechnicalIndicators technicalIndicators, int index) {
         ClosePriceIndicator closePriceIndicator = technicalIndicators.getClosePrice();
         double[] rsiResult = rsiNeuralNetwork.toPredict(getInputToRSINeuralNetwork(technicalIndicators, index));
         double[] smaResult = smaNeuralNetwork.toPredict(getInputToSMANeuralNetwork(technicalIndicators, index));
+        double[] macdResult = macdNeuralNetwork.toPredict(getInputToMACDNeuralNetwork(technicalIndicators, index));
+        double[] macdAnteriorResult = macdNeuralNetwork.toPredict(getInputToMACDNeuralNetwork(technicalIndicators, index - 1));
 
-        double trendIndicator = 0.5d;
+        double trendIndicator = 0d;
         System.out.println("Sequencia de precos: " + closePriceIndicator.getValue(index - 2).toDouble() + ", " + closePriceIndicator.getValue(index - 1).toDouble() + ", " + closePriceIndicator.getValue(index).toDouble());
         if (closePriceIndicator.getValue(index).toDouble() > closePriceIndicator.getValue(index - 1).toDouble() && closePriceIndicator.getValue(index - 1).toDouble() > closePriceIndicator.getValue(index - 2).toDouble()) {
-            trendIndicator = 1d;
-        } else if (closePriceIndicator.getValue(index).toDouble() < closePriceIndicator.getValue(index - 1).toDouble() && closePriceIndicator.getValue(index - 1).toDouble() < closePriceIndicator.getValue(index - 2).toDouble()) {
-            trendIndicator = 0;
+            trendIndicator = INDICATIVO_TENDENCIA_ALTA;
+//        } else if (closePriceIndicator.getValue(index).toDouble() < closePriceIndicator.getValue(index - 1).toDouble() && closePriceIndicator.getValue(index - 1).toDouble() < closePriceIndicator.getValue(index - 2).toDouble()) {
+//            trendIndicator = 0d;
         }
 
         System.out.println("Preco Atual: " + closePriceIndicator.getValue(index).toDouble());
@@ -95,8 +117,14 @@ public class TrainingNeuralNetwork {
         double[] input = {
             normalizePriceInput(closePriceIndicator.getValue(index).toDouble()),
             trendIndicator,
-            convertSignalInput(rsiResult[0]),
-            convertSignalInput(smaResult[0])
+//            convertSignalInput(macdAnteriorResult[0]),
+//            convertSignalInput(macdResult[0]),
+//            convertSignalInput(rsiResult[0]),
+//            convertSignalInput(smaResult[0])
+            macdAnteriorResult[0],
+            macdResult[0],
+            rsiResult[0],
+            smaResult[0]
         };
 
         return input;
@@ -108,11 +136,10 @@ public class TrainingNeuralNetwork {
         ClosePriceIndicator closePriceIndicator = technicalIndicators.getClosePrice();
         double diference = closePriceIndicator.getValue(index + tradesForTraining).toDouble() - closePriceIndicator.getValue(index).toDouble();
 
-        result = 0.5d;
         if (diference > 0) {
-            result = 1d;
-        } else if (diference < 0) {
-            result = 0d;
+            result = INDICATIVO_TENDENCIA_ALTA;
+        } else {
+            result = INDICATIVO_TENDENCIA_BAIXA;
         }
 
 //         normalizePriceInput(closePriceIndicator.getValue(index + tradesForTraining).toDouble()
@@ -150,13 +177,58 @@ public class TrainingNeuralNetwork {
         double result;
         RSIIndicator rsi14days = technicalIndicators.getRsi14days();
 
-        result = 0.5d;
-        if (rsi14days.getValue(index).toDouble() <= 30 || rsi14days.getValue(index - 1).toDouble() <= 30 || rsi14days.getValue(index - 2).toDouble() <= 30) {
-            result = 1d;
-        } else if (rsi14days.getValue(index).toDouble() >= 70 || rsi14days.getValue(index - 1).toDouble() >= 70 || rsi14days.getValue(index - 2).toDouble() >= 70) {
-            result = 0d;
+        result = INDICATIVO_TENDENCIA_LATERAL;
+        if (rsi14days.getValue(index).toDouble() <= 40 || rsi14days.getValue(index - 1).toDouble() <= 40 || rsi14days.getValue(index - 2).toDouble() <= 40) {
+            result = INDICATIVO_TENDENCIA_ALTA;
+        } else if (rsi14days.getValue(index).toDouble() >= 60 || rsi14days.getValue(index - 1).toDouble() >= 60 || rsi14days.getValue(index - 2).toDouble() >= 60) {
+            result = INDICATIVO_TENDENCIA_BAIXA;
         }
 
+        double[] output = {result};
+
+        return output;
+    }
+
+    private static List<DataSetRow> getMACDDataSetTraining(TimeSeries timeSeries, TechnicalIndicators technicalIndicators) {
+
+        List<DataSetRow> rsiDataSet = new ArrayList<>();
+        for (int i = TechnicalIndicators.getMaxDaysIndicators(); i < (timeSeries.getTickCount() - 1) - tradesForTraining; i++) {
+            DataSetRow row = new DataSetRow(TrainingNeuralNetwork.getInputToMACDNeuralNetwork(technicalIndicators, i), TrainingNeuralNetwork.getExpectedOutpuToMACDNeuralNetwork(technicalIndicators, i));
+            rsiDataSet.add(row);
+        }
+
+        return rsiDataSet;
+
+    }
+
+    private static double[] getInputToMACDNeuralNetwork(TechnicalIndicators technicalIndicators, int index) {
+        ClosePriceIndicator closePrice = technicalIndicators.getClosePrice();        
+        EMAIndicator ema5 = technicalIndicators.getEma5days();
+        EMAIndicator ema35 = technicalIndicators.getEma35days();
+
+        double[] input = {
+            normalizePriceInput(closePrice.getValue(index).toDouble()),
+            normalizePriceInput(ema5.getValue(index).toDouble()),            
+            normalizePriceInput(ema35.getValue(index).toDouble())
+        };
+
+        return input;
+    }
+
+    private static double[] getExpectedOutpuToMACDNeuralNetwork(TechnicalIndicators technicalIndicators, int index) {
+
+        double result;
+        ClosePriceIndicator closePrice = technicalIndicators.getClosePrice();
+        MACDIndicator macd = technicalIndicators.getMacd();
+        EMAIndicator ema5 = technicalIndicators.getEma5days();
+
+        result = INDICATIVO_TENDENCIA_LATERAL;
+        if (macd.getValue(index).toDouble() >= 1.20d) {
+            result = INDICATIVO_TENDENCIA_BAIXA;
+        } else if (macd.getValue(index).toDouble() <= -1.20d || macd.getValue(index).toDouble() >= (ema5.getValue(index).toDouble() - closePrice.getValue(index).toDouble())) {
+            result = INDICATIVO_TENDENCIA_ALTA;
+        }
+        
         double[] output = {result};
 
         return output;
@@ -171,7 +243,6 @@ public class TrainingNeuralNetwork {
         }
 
         return smaDataSet;
-
     }
 
     private static double[] getInputToSMANeuralNetwork(TechnicalIndicators technicalIndicators, int index) {
@@ -183,13 +254,7 @@ public class TrainingNeuralNetwork {
         double[] input = {
             normalizePriceInput(sma4days.getValue(index).toDouble()),
             normalizePriceInput(sma9days.getValue(index).toDouble()),
-            normalizePriceInput(sma18days.getValue(index).toDouble())//,
-//            normalizePriceInput(sma4days.getValue(index - 1).toDouble()),
-//            normalizePriceInput(sma9days.getValue(index - 1).toDouble()),
-//            normalizePriceInput(sma18days.getValue(index - 1).toDouble()),
-//            normalizePriceInput(sma4days.getValue(index - 2).toDouble()),
-//            normalizePriceInput(sma9days.getValue(index - 2).toDouble()),
-//            normalizePriceInput(sma18days.getValue(index - 2).toDouble())
+            normalizePriceInput(sma18days.getValue(index).toDouble())
         };
 
         return input;
@@ -201,12 +266,6 @@ public class TrainingNeuralNetwork {
         SMAIndicator sma9days = technicalIndicators.getSma9days();
         SMAIndicator sma18days = technicalIndicators.getSma18days();
 
-//        double[] signals = {
-//            getSignalFromSMA(sma4days.getValue(index).toDouble(), sma9days.getValue(index).toDouble(), sma18days.getValue(index).toDouble()),
-//            getSignalFromSMA(sma4days.getValue(index - 1).toDouble(), sma9days.getValue(index - 1).toDouble(), sma18days.getValue(index - 1).toDouble()),
-//            getSignalFromSMA(sma4days.getValue(index - 2).toDouble(), sma9days.getValue(index - 2).toDouble(), sma18days.getValue(index - 2).toDouble())
-//        };       
-//        double[] output = {getMostFrequentValue(signals)};
         double[] output = {getSignalFromSMA(sma4days.getValue(index).toDouble(), sma9days.getValue(index).toDouble(), sma18days.getValue(index).toDouble())};
 
         return output;
@@ -214,15 +273,13 @@ public class TrainingNeuralNetwork {
 
     private static double convertSignalInput(double signal) {
 
-        double convertedSignal = 0;
+        double convertedSignal = INDICATIVO_TENDENCIA_BAIXA;
 
-        if (signal > 0.33d && signal < 0.5d) {
-            convertedSignal = 0.5d;
+        if (signal > 0.33d && signal < 0.66d) {
+            convertedSignal = INDICATIVO_TENDENCIA_LATERAL;
         } else if (signal > 0.66d) {
-            convertedSignal = 1d;
+            convertedSignal = INDICATIVO_TENDENCIA_ALTA;
         }
-
-        System.out.println(Double.compare(signal, 0.66));
 
         System.out.println("Sinal para converter: " + signal + " convertido para: " + convertedSignal);
 
@@ -233,44 +290,19 @@ public class TrainingNeuralNetwork {
     private static double getSignalFromSMA(double fastLine, double mediumLine, double lazyLine) {
         double signal;
 
-        signal = 0.5d;
-
-        double diferenceFastMediumLine = fastLine - mediumLine;
-        double diferenceFastLazyLine = fastLine - lazyLine;
-
-        //double diferenceLazyMediumLine = lazyLine - mediumLine;
-        //double diferenceLazyFastLine = lazyLine - fastLine;
-        if ((diferenceFastMediumLine < 0 && diferenceFastLazyLine > 0) || (diferenceFastMediumLine < 0 && diferenceFastLazyLine < 0)) {
-            signal = 0d;
-        } else if ((diferenceFastMediumLine < 0 && diferenceFastLazyLine > 0) || (diferenceFastMediumLine > 0 && diferenceFastLazyLine > 0)) {
-            signal = 1d;
+        signal = INDICATIVO_TENDENCIA_LATERAL;
+        if ((fastLine >= mediumLine && mediumLine >= lazyLine) || (fastLine >= lazyLine) || (mediumLine >= lazyLine)) {
+            signal = INDICATIVO_TENDENCIA_ALTA;
+        } else if (fastLine < lazyLine && fastLine < mediumLine) {
+            signal = INDICATIVO_TENDENCIA_BAIXA;
         }
+//        if (( mediumLine && diferenceFastLazyLine > 0) || (diferenceFastMediumLine < 0 && diferenceFastLazyLine < 0)) {
+//            signal = 0d;
+//        } else if ((diferenceFastMediumLine < 0 && diferenceFastLazyLine > 0) || (diferenceFastMediumLine > 0 && diferenceFastLazyLine > 0)) {
+//            signal = 1d;        
+//        }
 
         return signal;
-    }
-
-    static int countOccurrences(double[] list, double targetValue) {
-        int count = 0;
-        for (int i = 0; i < list.length; i++) {
-            if (list[i] == targetValue) {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    static double getMostFrequentValue(double[] list) {
-        int mostFrequentCount = 0;
-        double mostFrequentValue = 0;
-        for (int i = 0; i < list.length; i++) {
-            double value = list[i];
-            int count = countOccurrences(list, value);
-            if (count > mostFrequentCount) {
-                mostFrequentCount = count;
-                mostFrequentValue = value;
-            }
-        }
-        return mostFrequentValue;
     }
 
     private static double normalizePriceInput(double priceValue) {
@@ -281,81 +313,7 @@ public class TrainingNeuralNetwork {
         return rsiValue / 100;
     }
 
-//    getInputToNeuralNetwork(technicalIndicators, timeSeries.getTickCount() - 1)
-//    
-//    private double[] getExpectedOutpuToNeuralNetwork(TechnicalIndicators technicalIndicators, int index) {
-//        ClosePriceIndicator closePriceIndicator = technicalIndicators.getClosePrice();
-//        System.out.println(closePriceIndicator.getTimeSeries().getTick(index + tradesForPredict).getDateName() + " " + tradesForPredict + " DIAS " + closePriceIndicator.getValue(index + tradesForPredict).toDouble());
-//        double[] output
-//                = {normalizeValue(closePriceIndicator.getValue(index + tradesForPredict).toDouble(), IndexMinAndMaxInSet.PRICE)};
-//        return output;
-//    }
-//
-//    private List<DataSetRow> generateDataSetToTraining() {
-//        List<DataSetRow> dataSet = new ArrayList<>();
-//
-//        TechnicalIndicators technicalIndicators = company.getTechnicalIndicators();
-//        TimeSeries timeSeries = technicalIndicators.getTimeSeries();
-//
-//        for (int i = TechnicalIndicators.getMaxDaysIndicators(); i < (timeSeries.getTickCount() - 1) - tradesForPredict; i++) {
-//            DataSetRow row = new DataSetRow(getInputToNeuralNetwork(technicalIndicators, i), getExpectedOutpuToNeuralNetwork(technicalIndicators, i));
-//            dataSet.add(row);
-//        }
-//
-//        return dataSet;
-//    }
-//
-//    private double[] getInputToNeuralNetwork(TechnicalIndicators technicalIndicators, int index) {
-//
-//        ClosePriceIndicator closePriceIndicator = technicalIndicators.getClosePrice();
-//        MACDIndicator macd = technicalIndicators.getMacd();
-//        RSIIndicator rsi14days = technicalIndicators.getRsi14days();
-//        SMAIndicator sma4days = technicalIndicators.getSma4days();
-//        SMAIndicator sma9days = technicalIndicators.getSma9days();
-//        SMAIndicator sma18days = technicalIndicators.getSma18days();
-//        OnBalanceVolumeIndicator obv = technicalIndicators.getObv();
-//
-//        System.out.println(closePriceIndicator.getTimeSeries().getTick(index).getDateName() + "  "
-//                + closePriceIndicator.getValue(index).toDouble() + ", "
-//                + sma4days.getValue(index).toDouble() + ", "
-//                + sma9days.getValue(index).toDouble() + ", "
-//                + sma18days.getValue(index).toDouble() + ", "
-//                + macd.getValue(index).toDouble() + ", "
-//                + rsi14days.getValue(index).toDouble() + ", "
-//                + obv.getValue(index).toDouble());
-//
-//        double[] input
-//                //
-//                //                
-//                //                normalizeValue(closePriceIndicator.getValue(index - 2).toDouble(), IndexMinAndMaxInSet.PRICE),
-//                //                    normalizeValue(closePriceIndicator.getValue(index - 1).toDouble(), IndexMinAndMaxInSet.PRICE),
-//                //                    normalizeValue(closePriceIndicator.getValue(index).toDouble(), IndexMinAndMaxInSet.PRICE),
-//                = {normalizeValue(closePriceIndicator.getValue(index).toDouble(), IndexMinAndMaxInSet.PRICE),
-//                    normalizeValue(closePriceIndicator.getValue(index - tradesForPredict).toDouble(), IndexMinAndMaxInSet.PRICE),
-//                    //normalizeValue(closePriceIndicator.getValue(index - 2 * tradesForPredict ).toDouble(), IndexMinAndMaxInSet.PRICE),
-//                    normalizeValue(sma4days.getValue(index).toDouble(), IndexMinAndMaxInSet.PRICE),
-//                    normalizeValue(sma4days.getValue(index - tradesForPredict).toDouble(), IndexMinAndMaxInSet.PRICE),
-//                    //normalizeValue(sma4days.getValue(index - 2 * tradesForPredict).toDouble(), IndexMinAndMaxInSet.PRICE),                    
-//                    normalizeValue(sma9days.getValue(index).toDouble(), IndexMinAndMaxInSet.PRICE),
-//                    normalizeValue(sma9days.getValue(index - tradesForPredict).toDouble(), IndexMinAndMaxInSet.PRICE),
-//                    //normalizeValue(sma9days.getValue(index - 2 * tradesForPredict).toDouble(), IndexMinAndMaxInSet.PRICE),
-//                    normalizeValue(sma18days.getValue(index).toDouble(), IndexMinAndMaxInSet.PRICE),
-//                    normalizeValue(sma18days.getValue(index - tradesForPredict).toDouble(), IndexMinAndMaxInSet.PRICE),
-//                    //normalizeValue(sma18days.getValue(index - 2 * tradesForPredict).toDouble(), IndexMinAndMaxInSet.PRICE),
-//                    normalizePercentage(rsi14days.getValue(index).toDouble()),
-//                    normalizePercentage(rsi14days.getValue(index - tradesForPredict).toDouble()),
-//                    normalizeValue(macd.getValue(index).toDouble(), IndexMinAndMaxInSet.MACD),
-//                    normalizeValue(macd.getValue(index - tradesForPredict).toDouble(), IndexMinAndMaxInSet.MACD),
-//                    normalizeValue(obv.getValue(index).toDouble(), IndexMinAndMaxInSet.VOLUME),
-//                    normalizeValue(obv.getValue(index - tradesForPredict).toDouble(), IndexMinAndMaxInSet.VOLUME)};
-//        //normalizePercentage(rsi14days.getValue(index - 2 * tradesForPredict).toDouble())};
-////                    
-////                    
-////                    normalizeValue(macd.getValue(index - 2).toDouble(), IndexMinAndMaxInSet.MACD),
-////                    normalizeValue(macd.getValue(index - 5).toDouble(), IndexMinAndMaxInSet.MACD),
-////                    };
-//
-//        return input;
-//
-//    }
+    private static double normalizeMACDInput(double macdValue) {
+        return macdValue / 10;
+    }
 }

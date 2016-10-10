@@ -40,6 +40,15 @@ public class PredictionNeuralNetwork {
         neuralNetwork.setNetworkType(NeuralNetworkType.MULTI_LAYER_PERCEPTRON);
 
     }
+    
+    public PredictionNeuralNetwork(String companySymbol, String neuralNetworkName, int inputLength, int outputLength) {
+        this.inputLength = inputLength;
+        this.outputLength = outputLength;
+        fileNameNeuralNetwork = companySymbol + neuralNetworkName + ".neuralnet";
+        neuralNetwork = new MultiLayerPerceptron(inputLength, 2 * inputLength + 1, outputLength);
+        neuralNetwork.setNetworkType(NeuralNetworkType.MULTI_LAYER_PERCEPTRON);
+
+    }
 
     public PredictionNeuralNetwork(String companySymbol, String neuralNetworkName) {
         fileNameNeuralNetwork = companySymbol + neuralNetworkName + ".neuralnet";
@@ -87,16 +96,16 @@ public class PredictionNeuralNetwork {
 
     public void toTrain(List<DataSetRow> dataSet) {
         System.out.println("Iniciando treinamento da rede " + fileNameNeuralNetwork);
-        WeightsRandomizer randomizer = new WeightsRandomizer();
-        Random random = new Random(Calendar.getInstance().getTimeInMillis());
-        randomizer.setRandomGenerator(random);
-        neuralNetwork.randomizeWeights(randomizer);
-//        neuralNetwork.randomizeWeights();
-        BackPropagation learningRules = new BackPropagation();
+//        WeightsRandomizer randomizer = new WeightsRandomizer();
+//        Random random = new Random(Calendar.getInstance().getTimeInMillis());
+//        randomizer.setRandomGenerator(random);
+//        neuralNetwork.randomizeWeights(randomizer);
+        neuralNetwork.randomizeWeights();
+        BackPropagation learningRules = new BackPropagation();        
         learningRules.setMaxIterations(maxIterationsForLearning);
         learningRules.setMaxError(maxErrorForLearning);
         learningRules.setLearningRate(learningRateForLearning);
-        neuralNetwork.connectInputsToOutputs();
+        
         //learningRules.setBatchMode(true);
 
         DataSet trainingSet;
@@ -106,7 +115,7 @@ public class PredictionNeuralNetwork {
             trainingSet.addRow(row);
         }
 
-        neuralNetwork.learn(trainingSet, learningRules);
+        neuralNetwork.learn(trainingSet, learningRules);        
         neuralNetwork.save(fileNameNeuralNetwork);
         System.out.println("Rede " + fileNameNeuralNetwork + " salva em arquivo.");
     }

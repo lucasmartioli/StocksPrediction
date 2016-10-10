@@ -26,7 +26,7 @@ import org.joda.time.DateTime;
  */
 public class TechnicalIndicators {
 
-    static final int maxDaysIndicators = 50;
+    static final int maxDaysIndicators = 26;
 
     public static int getMaxDaysIndicators() {
         return maxDaysIndicators;
@@ -37,6 +37,9 @@ public class TechnicalIndicators {
     private final SMAIndicator sma4days;
     private final SMAIndicator sma9days;
     private final SMAIndicator sma18days;
+    private final EMAIndicator ema35days;
+    private final EMAIndicator ema5days;
+    private final EMAIndicator ema5daysN;
     private final MACDIndicator macd;
     private final RSIIndicator rsi14days;
     private final OnBalanceVolumeIndicator obv;
@@ -54,14 +57,17 @@ public class TechnicalIndicators {
         }
 
         this.timeSeries = new TimeSeries(tickList);
-        
+
         this.closePrice = new ClosePriceIndicator(timeSeries);
         this.obv = new OnBalanceVolumeIndicator(timeSeries);
         this.rsi14days = new RSIIndicator(closePrice, 14);
-        this.macd = new MACDIndicator(closePrice, 12, 26);
+        this.macd = new MACDIndicator(closePrice, 5, 35);
         this.sma18days = new SMAIndicator(closePrice, 18);
         this.sma9days = new SMAIndicator(closePrice, 9);
         this.sma4days = new SMAIndicator(closePrice, 4);
+        this.ema5days = new EMAIndicator(closePrice, 5);
+        this.ema35days = new EMAIndicator(closePrice, 35);
+        this.ema5daysN = new EMAIndicator(closePrice, 5);
 
     }
 
@@ -91,6 +97,18 @@ public class TechnicalIndicators {
 
     public RSIIndicator getRsi14days() {
         return rsi14days;
+    }
+
+    public EMAIndicator getEma35days() {
+        return ema35days;
+    }
+
+    public EMAIndicator getEma5days() {
+        return ema5days;
+    }
+
+    public EMAIndicator getEma5daysN() {
+        return ema5daysN;
     }
 
     public OnBalanceVolumeIndicator getObv() {
