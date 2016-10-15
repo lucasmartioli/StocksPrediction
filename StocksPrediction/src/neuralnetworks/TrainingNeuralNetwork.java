@@ -25,38 +25,38 @@ import technicalindicators.TechnicalIndicators;
  */
 public class TrainingNeuralNetwork {
 
-    private static final int tradesForTraining = 1;
+    private static final int tradesForTraining = 5;
     private static final double INDICATIVO_TENDENCIA_ALTA = 1d;
     private static final double INDICATIVO_TENDENCIA_BAIXA = 0d;
     private static final double INDICATIVO_TENDENCIA_LATERAL = 0.5d;
 
-    public static void toTrain(Company company) {
+    public static void toTrain(Company company, int initialIndex, int finalIndex) {
         TechnicalIndicators technicalIndicators = company.getTechnicalIndicators();
         TimeSeries timeSeries = technicalIndicators.getTimeSeries();
 
         PredictionNeuralNetwork rsiNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "RSI", 3, 1, TransferFunctionType.SIGMOID);
-        rsiNeuralNetwork.setLearningRateForLearning(0.8d);
-        rsiNeuralNetwork.setMaxErrorForLearning(0d);
-        rsiNeuralNetwork.setMaxIterationsForLearning(4000);
-        rsiNeuralNetwork.toTrain(getRSIDataSetTraining(timeSeries, technicalIndicators));
+        rsiNeuralNetwork.setLearningRateForLearning(0.9d);
+        rsiNeuralNetwork.setMaxErrorForLearning(0.1d);
+        rsiNeuralNetwork.setMaxIterationsForLearning(1000);
+        rsiNeuralNetwork.toTrain(getRSIDataSetTraining(initialIndex, finalIndex, technicalIndicators));
 
         PredictionNeuralNetwork smaNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "SMA", 3, 1, TransferFunctionType.SIGMOID);
-        smaNeuralNetwork.setLearningRateForLearning(0.8d);
-        smaNeuralNetwork.setMaxErrorForLearning(0d);
-        smaNeuralNetwork.setMaxIterationsForLearning(4000);
-        smaNeuralNetwork.toTrain(getSMADataSetTraining(timeSeries, technicalIndicators));
+        smaNeuralNetwork.setLearningRateForLearning(0.9d);
+        smaNeuralNetwork.setMaxErrorForLearning(0.1d);
+        smaNeuralNetwork.setMaxIterationsForLearning(1000);
+        smaNeuralNetwork.toTrain(getSMADataSetTraining(initialIndex, finalIndex, technicalIndicators));
 
         PredictionNeuralNetwork macdNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "MACD", 3, 1, TransferFunctionType.SIGMOID);
-        macdNeuralNetwork.setLearningRateForLearning(0.8d);
-        macdNeuralNetwork.setMaxErrorForLearning(0d);
-        macdNeuralNetwork.setMaxIterationsForLearning(4000);
-        macdNeuralNetwork.toTrain(getMACDDataSetTraining(timeSeries, technicalIndicators));
+        macdNeuralNetwork.setLearningRateForLearning(0.9d);
+        macdNeuralNetwork.setMaxErrorForLearning(0.1d);
+        macdNeuralNetwork.setMaxIterationsForLearning(1000);
+        macdNeuralNetwork.toTrain(getMACDDataSetTraining(initialIndex, finalIndex, technicalIndicators));
 
-        PredictionNeuralNetwork obvNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "OBV", 1, 1, TransferFunctionType.SIGMOID);
-        obvNeuralNetwork.setLearningRateForLearning(0.8d);
-        obvNeuralNetwork.setMaxErrorForLearning(0.001d);
+        PredictionNeuralNetwork obvNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "OBV", 3, 1, TransferFunctionType.SIGMOID);
+        obvNeuralNetwork.setLearningRateForLearning(0.9d);
+        obvNeuralNetwork.setMaxErrorForLearning(0.1d);
         obvNeuralNetwork.setMaxIterationsForLearning(1000);
-        //obvNeuralNetwork.toTrain(getOBVDataSetTraining(timeSeries, technicalIndicators));
+        obvNeuralNetwork.toTrain(getOBVDataSetTraining(initialIndex, finalIndex, technicalIndicators));
 
         rsiNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "RSI");
         smaNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "SMA");
@@ -64,15 +64,14 @@ public class TrainingNeuralNetwork {
         obvNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "OBV");
 
         PredictionNeuralNetwork prediction = new PredictionNeuralNetwork(company.getSimbolo(), "PREDICTION", 6, 1, TransferFunctionType.SIGMOID);
-        prediction.setLearningRateForLearning(0.8d);
-        prediction.setMaxErrorForLearning(0d);
-        prediction.setMaxIterationsForLearning(4000);
-        prediction.toTrain(getPREDICTIONDataSetTraining(timeSeries, technicalIndicators, rsiNeuralNetwork, smaNeuralNetwork, macdNeuralNetwork));
+        prediction.setLearningRateForLearning(0.5d);
+        prediction.setMaxErrorForLearning(0.00001d);
+        prediction.setMaxIterationsForLearning(1000);
+        prediction.toTrain(getPREDICTIONDataSetTraining(initialIndex, finalIndex, technicalIndicators, rsiNeuralNetwork, smaNeuralNetwork, macdNeuralNetwork, obvNeuralNetwork));
     }
 
-    public static double toPredict(Company company) {
-        TechnicalIndicators technicalIndicators = company.getTechnicalIndicators();
-        TimeSeries timeSeries = technicalIndicators.getTimeSeries();
+    public static double toPredict(Company company, int finalIndex) {
+        TechnicalIndicators technicalIndicators = company.getTechnicalIndicators();        
 
         PredictionNeuralNetwork macdNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "MACD");
         PredictionNeuralNetwork rsiNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "RSI");
@@ -80,38 +79,39 @@ public class TrainingNeuralNetwork {
         PredictionNeuralNetwork obvNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "OBV");
         PredictionNeuralNetwork prediction = new PredictionNeuralNetwork(company.getSimbolo(), "PREDICTION");
 
-        double[] result = prediction.toPredict(getInputToPREDICTIONNeuralNetwork(macdNeuralNetwork, rsiNeuralNetwork, smaNeuralNetwork, technicalIndicators, timeSeries.getTickCount() - 1));
+        double[] result = prediction.toPredict(getInputToPREDICTIONNeuralNetwork(obvNeuralNetwork, macdNeuralNetwork, rsiNeuralNetwork, smaNeuralNetwork, technicalIndicators, finalIndex));
 
         return result[0];
     }
 
-    private static List<DataSetRow> getPREDICTIONDataSetTraining(TimeSeries timeSeries, TechnicalIndicators technicalIndicators, PredictionNeuralNetwork rsiNeuralNetwork, PredictionNeuralNetwork smaNeuralNetwork, PredictionNeuralNetwork macdNeuralNetwork) {
+    private static List<DataSetRow> getPREDICTIONDataSetTraining(int initialIndex, int finalIndex, TechnicalIndicators technicalIndicators, PredictionNeuralNetwork rsiNeuralNetwork, PredictionNeuralNetwork smaNeuralNetwork, PredictionNeuralNetwork macdNeuralNetwork, PredictionNeuralNetwork obvNeuralNetwork) {
 
         List<DataSetRow> predictionDataSet = new ArrayList<>();
-        for (int i = TechnicalIndicators.getMaxDaysIndicators(); i < (timeSeries.getTickCount() - 1) - tradesForTraining; i++) {
-            DataSetRow row = new DataSetRow(TrainingNeuralNetwork.getInputToPREDICTIONNeuralNetwork(macdNeuralNetwork, rsiNeuralNetwork, smaNeuralNetwork, technicalIndicators, i), TrainingNeuralNetwork.getExpectedOutpuToPREDICTIONNeuralNetwork(technicalIndicators, i));
+        for (int i = initialIndex; i < finalIndex - tradesForTraining; i++) {
+            DataSetRow row = new DataSetRow(TrainingNeuralNetwork.getInputToPREDICTIONNeuralNetwork(obvNeuralNetwork, macdNeuralNetwork, rsiNeuralNetwork, smaNeuralNetwork, technicalIndicators, i), TrainingNeuralNetwork.getExpectedOutpuToPREDICTIONNeuralNetwork(technicalIndicators, i));
             predictionDataSet.add(row);
         }
 
         return predictionDataSet;
     }
 
-    private static double[] getInputToPREDICTIONNeuralNetwork(PredictionNeuralNetwork macdNeuralNetwork, PredictionNeuralNetwork rsiNeuralNetwork, PredictionNeuralNetwork smaNeuralNetwork, TechnicalIndicators technicalIndicators, int index) {
+    private static double[] getInputToPREDICTIONNeuralNetwork(PredictionNeuralNetwork obvNeuralNetwork, PredictionNeuralNetwork macdNeuralNetwork, PredictionNeuralNetwork rsiNeuralNetwork, PredictionNeuralNetwork smaNeuralNetwork, TechnicalIndicators technicalIndicators, int index) {
         ClosePriceIndicator closePriceIndicator = technicalIndicators.getClosePrice();
         double[] rsiResult = rsiNeuralNetwork.toPredict(getInputToRSINeuralNetwork(technicalIndicators, index));
         double[] smaResult = smaNeuralNetwork.toPredict(getInputToSMANeuralNetwork(technicalIndicators, index));
         double[] macdResult = macdNeuralNetwork.toPredict(getInputToMACDNeuralNetwork(technicalIndicators, index));
         double[] macdAnteriorResult = macdNeuralNetwork.toPredict(getInputToMACDNeuralNetwork(technicalIndicators, index - 1));
+        double[] obvResult = obvNeuralNetwork.toPredict(getInputToOBVNeuralNetwork(technicalIndicators, index));
 
-        double trendIndicator = 0d;
+        double trendIndicator = INDICATIVO_TENDENCIA_LATERAL;
         System.out.println("Sequencia de precos: " + closePriceIndicator.getValue(index - 2).toDouble() + ", " + closePriceIndicator.getValue(index - 1).toDouble() + ", " + closePriceIndicator.getValue(index).toDouble());
-        if (closePriceIndicator.getValue(index).toDouble() > closePriceIndicator.getValue(index - 1).toDouble() && closePriceIndicator.getValue(index - 1).toDouble() > closePriceIndicator.getValue(index - 2).toDouble()) {
+        if (closePriceIndicator.getValue(index).toDouble() >= closePriceIndicator.getValue(index - 1).toDouble() && closePriceIndicator.getValue(index - 1).toDouble() >= closePriceIndicator.getValue(index - 2).toDouble()) {
             trendIndicator = INDICATIVO_TENDENCIA_ALTA;
-//        } else if (closePriceIndicator.getValue(index).toDouble() < closePriceIndicator.getValue(index - 1).toDouble() && closePriceIndicator.getValue(index - 1).toDouble() < closePriceIndicator.getValue(index - 2).toDouble()) {
-//            trendIndicator = 0d;
+        } else if (closePriceIndicator.getValue(index).toDouble() < closePriceIndicator.getValue(index - 1).toDouble() && closePriceIndicator.getValue(index - 1).toDouble() < closePriceIndicator.getValue(index - 2).toDouble()) {
+            trendIndicator = INDICATIVO_TENDENCIA_BAIXA;
         }
 
-        System.out.println("Preco Atual: " + closePriceIndicator.getValue(index).toDouble());
+        System.err.println("Preco Atual: " + closePriceIndicator.getValue(index).toDouble());
 //        System.out.println("Preco Futuro: " + closePriceIndicator.getValue(index + tradesForTraining).toDouble());
 
         double[] input = {
@@ -124,7 +124,8 @@ public class TrainingNeuralNetwork {
             macdAnteriorResult[0],
             macdResult[0],
             rsiResult[0],
-            smaResult[0]
+            //convertSignalInput(smaResult[0]),
+            obvResult[0]
         };
 
         return input;
@@ -143,15 +144,16 @@ public class TrainingNeuralNetwork {
         }
 
 //         normalizePriceInput(closePriceIndicator.getValue(index + tradesForTraining).toDouble()
-        double[] output = {result};
+        double[] output = {normalizePriceInput(closePriceIndicator.getValue(index + tradesForTraining).toDouble())};
+//        double[] output = {result};
 
         return output;
     }
-
-    private static List<DataSetRow> getRSIDataSetTraining(TimeSeries timeSeries, TechnicalIndicators technicalIndicators) {
+    
+    private static List<DataSetRow> getRSIDataSetTraining(int initialIndex, int finalIndex, TechnicalIndicators technicalIndicators) {
 
         List<DataSetRow> rsiDataSet = new ArrayList<>();
-        for (int i = TechnicalIndicators.getMaxDaysIndicators(); i < (timeSeries.getTickCount() - 1) - tradesForTraining; i++) {
+        for (int i = initialIndex; i < finalIndex - tradesForTraining; i++) {
             DataSetRow row = new DataSetRow(TrainingNeuralNetwork.getInputToRSINeuralNetwork(technicalIndicators, i), TrainingNeuralNetwork.getExpectedOutpuToRSINeuralNetwork(technicalIndicators, i));
             rsiDataSet.add(row);
         }
@@ -189,10 +191,51 @@ public class TrainingNeuralNetwork {
         return output;
     }
 
-    private static List<DataSetRow> getMACDDataSetTraining(TimeSeries timeSeries, TechnicalIndicators technicalIndicators) {
+    private static List<DataSetRow> getOBVDataSetTraining(int initialIndex, int finalIndex, TechnicalIndicators technicalIndicators) {
 
         List<DataSetRow> rsiDataSet = new ArrayList<>();
-        for (int i = TechnicalIndicators.getMaxDaysIndicators(); i < (timeSeries.getTickCount() - 1) - tradesForTraining; i++) {
+        for (int i = initialIndex; i < finalIndex - tradesForTraining; i++) {
+            DataSetRow row = new DataSetRow(TrainingNeuralNetwork.getInputToOBVNeuralNetwork(technicalIndicators, i), TrainingNeuralNetwork.getExpectedOutpuToOBVNeuralNetwork(technicalIndicators, i));
+            rsiDataSet.add(row);
+        }
+
+        return rsiDataSet;
+
+    }
+
+    private static double[] getInputToOBVNeuralNetwork(TechnicalIndicators technicalIndicators, int index) {
+        OnBalanceVolumeIndicator obv = technicalIndicators.getObv();
+
+        double[] input = {
+            normalizeOBVInput(obv.getValue(index).toDouble()),
+            normalizeOBVInput(obv.getValue(index - 1).toDouble()),
+            normalizeOBVInput(obv.getValue(index - 2).toDouble())
+        };
+
+        return input;
+    }
+
+    private static double[] getExpectedOutpuToOBVNeuralNetwork(TechnicalIndicators technicalIndicators, int index) {
+
+        double result;
+        OnBalanceVolumeIndicator obv = technicalIndicators.getObv();
+
+        result = INDICATIVO_TENDENCIA_LATERAL;
+        if (obv.getValue(index).toDouble() >= obv.getValue(index - 1).toDouble() && obv.getValue(index - 1).toDouble() >= obv.getValue(index - 1).toDouble()) {
+            result = INDICATIVO_TENDENCIA_ALTA;
+        } else if (obv.getValue(index).toDouble() < obv.getValue(index - 1).toDouble() && obv.getValue(index - 1).toDouble() < obv.getValue(index - 1).toDouble()) {
+            result = INDICATIVO_TENDENCIA_BAIXA;
+        }
+
+        double[] output = {result};
+
+        return output;
+    }
+
+    private static List<DataSetRow> getMACDDataSetTraining(int initialIndex, int finalIndex, TechnicalIndicators technicalIndicators) {
+
+        List<DataSetRow> rsiDataSet = new ArrayList<>();
+        for (int i = initialIndex; i < finalIndex - tradesForTraining; i++) {
             DataSetRow row = new DataSetRow(TrainingNeuralNetwork.getInputToMACDNeuralNetwork(technicalIndicators, i), TrainingNeuralNetwork.getExpectedOutpuToMACDNeuralNetwork(technicalIndicators, i));
             rsiDataSet.add(row);
         }
@@ -234,10 +277,10 @@ public class TrainingNeuralNetwork {
         return output;
     }
 
-    private static List<DataSetRow> getSMADataSetTraining(TimeSeries timeSeries, TechnicalIndicators technicalIndicators) {
+    private static List<DataSetRow> getSMADataSetTraining(int initialIndex, int finalIndex, TechnicalIndicators technicalIndicators) {
 
         List<DataSetRow> smaDataSet = new ArrayList<>();
-        for (int i = TechnicalIndicators.getMaxDaysIndicators(); i < (timeSeries.getTickCount() - 1) - tradesForTraining; i++) {
+        for (int i = initialIndex; i < finalIndex - tradesForTraining; i++) {
             DataSetRow row = new DataSetRow(TrainingNeuralNetwork.getInputToSMANeuralNetwork(technicalIndicators, i), TrainingNeuralNetwork.getExpectedOutpuToSMANeuralNetwork(technicalIndicators, i));
             smaDataSet.add(row);
         }
@@ -311,6 +354,12 @@ public class TrainingNeuralNetwork {
 
     private static double normalizeRSIInput(double rsiValue) {
         return rsiValue / 100;
+    }
+    
+    private static double normalizeOBVInput(double obvValue) {
+        double v1 =obvValue / 1000000000;
+        v1 = v1 / 100;
+        return v1;
     }
 
     private static double normalizeMACDInput(double macdValue) {
