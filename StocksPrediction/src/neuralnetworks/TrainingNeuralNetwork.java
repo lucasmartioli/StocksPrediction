@@ -25,7 +25,7 @@ import technicalindicators.TechnicalIndicators;
  */
 public class TrainingNeuralNetwork {
 
-    private static final int tradesForTraining = 5;
+    private static final int tradesForTraining = 1;
     private static final double INDICATIVO_TENDENCIA_ALTA = 1d;
     private static final double INDICATIVO_TENDENCIA_BAIXA = 0d;
     private static final double INDICATIVO_TENDENCIA_LATERAL = 0.5d;
@@ -62,10 +62,10 @@ public class TrainingNeuralNetwork {
         macdNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "MACD");
         obvNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "OBV");
 
-        PredictionNeuralNetwork prediction = new PredictionNeuralNetwork(company.getSimbolo(), "PREDICTION", 8, 1, TransferFunctionType.SIGMOID);
-        prediction.setLearningRateForLearning(0.8d);
-        prediction.setMaxErrorForLearning(0.001d);
-        prediction.setMaxIterationsForLearning(500);
+        PredictionNeuralNetwork prediction = new PredictionNeuralNetwork(company.getSimbolo(), "PREDICTION", 7, 1, TransferFunctionType.SIGMOID);
+        prediction.setLearningRateForLearning(0.5d);
+        prediction.setMaxErrorForLearning(0.00000001d);
+        prediction.setMaxIterationsForLearning(10000);
         prediction.toTrain(getPREDICTIONDataSetTraining(initialIndex, finalIndex, technicalIndicators, rsiNeuralNetwork, smaNeuralNetwork, macdNeuralNetwork, obvNeuralNetwork));
     }
 
@@ -115,13 +115,8 @@ public class TrainingNeuralNetwork {
 //        System.out.println("Preco Futuro: " + closePriceIndicator.getValue(index + tradesForTraining).toDouble());
 
         double[] input = {
-            normalizePriceInput(closePriceIndicator.getValue(index).toDouble()),
-            normalizePriceInput(closePriceIndicator.getValue(index - tradesForTraining).toDouble()),
+            normalizePriceInput(closePriceIndicator.getValue(index).toDouble()),            
             trendIndicator,
-//            convertSignalInput(macdAnteriorResult[0]),
-//            convertSignalInput(macdResult[0]),
-//            convertSignalInput(rsiResult[0]),
-//            convertSignalInput(smaResult[0])
             convertSignalInput(macdAnteriorResult2[0]),
             convertSignalInput(macdAnteriorResult[0]),
             convertSignalInput(macdResult[0]),

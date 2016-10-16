@@ -36,14 +36,15 @@ import technicalindicators.TechnicalIndicators;
 public class TestsResults {
 
     public static void main(String[] args) {
+        int tradesToPredict = 1;
 
         try {
             Calendar di = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
-            di.set(13, 5, 1, 12, 0);
+            di.set(14, 5, 1, 12, 0);
             Calendar df = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
             df.set(16, 9, 15, 12, 0);
 
-            Company vivo = LoadingCompany.loading("PETR4", di, df);
+            Company vivo = LoadingCompany.loading("CPLE6", di, df);
 
 //            TechnicalIndicators technicalIndicators = vivo.getTechnicalIndicators();
             TimeSeries timeSeries = vivo.getTechnicalIndicators().getTimeSeries();
@@ -52,13 +53,16 @@ public class TestsResults {
 
             indicadorInicial += 30; // desconsiderando valores iniciais onde os indicadores não fazem tanto sentido.
 
+            TimeSeriesCollection dataset = new TimeSeriesCollection();
+            //for (double percent = 0.1; percent < 1d; percent += 0.1d) {
+
             int inicioTreinamento = indicadorInicial;
-            int finalTreinamento = Math.round(((float) (indicadorFinal * 0.66d)));
+            int finalTreinamento = Math.round(((float) (indicadorFinal * 0.7d)));
             int inicioTestes = finalTreinamento + 1;
             int finalTestes = indicadorFinal;
 
             TrainingNeuralNetwork.toTrain(vivo, inicioTreinamento, finalTreinamento);
-            
+
             org.jfree.data.time.TimeSeries chartResultados = new org.jfree.data.time.TimeSeries("Calculado");
             for (int i = inicioTestes; i <= finalTestes; i++) {
 
@@ -66,27 +70,26 @@ public class TestsResults {
                 System.out.println("Saida do algoritmo: " + saida * 100);
                 System.out.println("");
                 System.out.println("Dia sendo analisado: " + timeSeries.getTick(i));
-                if (i + 5 <= finalTestes) {
-                    System.out.println("Diferença: " + ((saida * 100) - timeSeries.getTick(i + 5).getClosePrice().toDouble()) + " Dia no futuro: " + timeSeries.getTick(i + 5));
-                    Tick tick = timeSeries.getTick(i + 5);
+                if (i + tradesToPredict <= finalTestes) {
+                    System.out.println("Diferença: " + ((saida * 100) - timeSeries.getTick(i + tradesToPredict).getClosePrice().toDouble()) + " Dia no futuro: " + timeSeries.getTick(i + tradesToPredict));
+                    Tick tick = timeSeries.getTick(i + tradesToPredict);
                     chartResultados.add(new Day(tick.getEndTime().toDate()), (saida * 100d));
                 } else {
                     System.out.println("Não tem como saber o futuro ainda!!");
                 }
                 System.out.println("");
-
             }
 
-            TimeSeriesCollection dataset = new TimeSeriesCollection();
             dataset.addSeries(buildChartTimeSeries(inicioTestes, timeSeries, vivo.getTechnicalIndicators().getClosePrice(), vivo.getSimbolo() + " - Close Price"));
             dataset.addSeries(chartResultados);
+            //}
+
 //        dataset.addSeries(buildChartTimeSeries(timeSeries, sma, "Média móvel Simples - 4 dias"));
 //        dataset.addSeries(buildChartTimeSeries(timeSeries, sma9, "Média móvel Simples - 9 dias"));
 //        dataset.addSeries(buildChartTimeSeries(serie, sma18, "Média móvel Simples - 18 dias"));
             //dataset.addSeries(buildChartTimeSeries(serie, macd, "MACD - 12 e 26 dias"));
             //dataset.addSeries(buildChartTimeSeries(serie, rsi, "RSI - 14 dias"));
             //dataset.addSeries(buildChartTimeSeries(serie, obv, "OBV"));
-
             /**
              * Creating the chart
              */
