@@ -36,15 +36,15 @@ import technicalindicators.TechnicalIndicators;
 public class TestsResults {
 
     public static void main(String[] args) {
-        int tradesToPredict = 1;
+        int tradesToPredict = 3;
 
         try {
             Calendar di = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
-            di.set(14, 5, 1, 12, 0);
+            di.set(14, 0, 1, 12, 0);
             Calendar df = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
-            df.set(16, 9, 15, 12, 0);
+            df.set(19, 9, 15, 12, 0);
 
-            Company vivo = LoadingCompany.loading("CPLE6", di, df);
+            Company vivo = LoadingCompany.loading("VALE5", di, df);
 
 //            TechnicalIndicators technicalIndicators = vivo.getTechnicalIndicators();
             TimeSeries timeSeries = vivo.getTechnicalIndicators().getTimeSeries();
@@ -57,7 +57,7 @@ public class TestsResults {
             //for (double percent = 0.1; percent < 1d; percent += 0.1d) {
 
             int inicioTreinamento = indicadorInicial;
-            int finalTreinamento = Math.round(((float) (indicadorFinal * 0.7d)));
+            int finalTreinamento = Math.round(((float) (indicadorFinal * 0.95d)));
             int inicioTestes = finalTreinamento + 1;
             int finalTestes = indicadorFinal;
 
