@@ -36,7 +36,7 @@ import technicalindicators.TechnicalIndicators;
 public class TestsResults {
 
     public static void main(String[] args) {
-        int tradesToPredict = 1;
+        int tradesToPredict = 5;
 
         try {
             Calendar di = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
@@ -44,7 +44,7 @@ public class TestsResults {
             Calendar df = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
             df.set(16, 9, 1, 12, 0);
 
-            Company vivo = LoadingCompany.loading("ITUB4", di, df);
+            Company vivo = LoadingCompany.loading("VIVT4", di, df);
 
 //            TechnicalIndicators technicalIndicators = vivo.getTechnicalIndicators();
             TimeSeries timeSeries = vivo.getTechnicalIndicators().getTimeSeries();
@@ -78,10 +78,10 @@ public class TestsResults {
                     im = -10d;                    
                 }
                 if (i + tradesToPredict <= finalTestes) {
-                    System.out.println("Diferença: " + ((saida[0] * im + timeSeries.getTick(i + tradesToPredict).getClosePrice().toDouble()) - timeSeries.getTick(i + tradesToPredict).getClosePrice().toDouble()) + " Dia no futuro: " + timeSeries.getTick(i + tradesToPredict));
+                    System.out.println("Diferença: " + ((saida[0] * im + timeSeries.getTick(i).getClosePrice().toDouble()) - timeSeries.getTick(i + tradesToPredict).getClosePrice().toDouble()) + " Dia no futuro: " + timeSeries.getTick(i + tradesToPredict));
                     Tick tick = timeSeries.getTick(i + tradesToPredict);
-                    chartResultados.add(new Day(tick.getEndTime().toDate()), (saida[0] * im + timeSeries.getTick(i + tradesToPredict).getClosePrice().toDouble()));
-                    chartDiferencas.add(new Day(tick.getEndTime().toDate()), 10d * Math.abs((saida[0] * im + timeSeries.getTick(i + tradesToPredict).getClosePrice().toDouble()) - timeSeries.getTick(i + tradesToPredict).getClosePrice().toDouble()));
+                    chartResultados.add(new Day(tick.getEndTime().toDate()), (saida[0] * im + timeSeries.getTick(i).getClosePrice().toDouble()));
+                    chartDiferencas.add(new Day(tick.getEndTime().toDate()), 10d * Math.abs((saida[0] * im + timeSeries.getTick(i).getClosePrice().toDouble()) - timeSeries.getTick(i + tradesToPredict).getClosePrice().toDouble()));
                 } else {
                     System.out.println("Não tem como saber o futuro ainda!!");
                 }

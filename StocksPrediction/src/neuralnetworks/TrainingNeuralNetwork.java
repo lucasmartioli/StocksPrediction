@@ -28,7 +28,7 @@ import technicalindicators.TechnicalIndicators;
  */
 public class TrainingNeuralNetwork {
 
-    private static final int tradesForTraining = 1;
+    private static final int tradesForTraining = 5;
     private static final double INDICATIVO_TENDENCIA_ALTA = 1d;
     private static final double INDICATIVO_TENDENCIA_BAIXA = 0d;
     private static final double INDICATIVO_TENDENCIA_LATERAL = 0.5d;
