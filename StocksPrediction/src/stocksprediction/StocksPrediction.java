@@ -62,7 +62,7 @@ public class StocksPrediction {
 //                }
                 vivo = LoadingCompany.loading("PETR4", di, df);
 
-                double result = TrainingNeuralNetwork.toPredict(vivo, vivo.getTechnicalIndicators().getTimeSeries().getEnd());
+                double[] result = TrainingNeuralNetwork.toPredict(vivo, vivo.getTechnicalIndicators().getTimeSeries().getEnd());
 
                 vivo2 = LoadingCompany.loading("PETR4", df, dfuturo);               
 //                for (int j = 1; j < ; j++) {
@@ -71,11 +71,11 @@ public class StocksPrediction {
 //                vivo2.getTechnicalIndicators().getClosePrice();
                 if (vivo2.getTechnicalIndicators().getTimeSeries().getTickCount() > 0)
                     System.err.println("Resultado: " 
-                            + 100 * result + 
+                            + 100 * result[0] + 
                             " Real futuro: " + 
                             vivo2.getTechnicalIndicators().getClosePrice().getValue(vivo2.getTechnicalIndicators().getTimeSeries().getTickCount() - 1)
                             + "DIFERENCA: " + 
-                            ((100d * result) - vivo2.getTechnicalIndicators().getClosePrice().getValue(vivo2.getTechnicalIndicators().getTimeSeries().getTickCount() - 1).toDouble()));
+                            ((100d * result[0]) - vivo2.getTechnicalIndicators().getClosePrice().getValue(vivo2.getTechnicalIndicators().getTimeSeries().getTickCount() - 1).toDouble()));
                 
                 else 
                     System.err.println("Nem DEU");

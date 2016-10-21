@@ -36,13 +36,13 @@ import technicalindicators.TechnicalIndicators;
 public class TestsResults {
 
     public static void main(String[] args) {
-        int tradesToPredict = 5;
+        int tradesToPredict = 1;
 
         try {
             Calendar di = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
-            di.set(15, 6, 1, 12, 0);
+            di.set(13, 5, 1, 12, 0);
             Calendar df = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
-            df.set(19, 9, 15, 12, 0);
+            df.set(16, 9, 1, 12, 0);
 
             Company vivo = LoadingCompany.loading("ITUB4", di, df);
 
@@ -51,13 +51,13 @@ public class TestsResults {
             int indicadorInicial = timeSeries.getBegin();
             int indicadorFinal = timeSeries.getEnd();
 
-            indicadorInicial += 30; // desconsiderando valores iniciais onde os indicadores não fazem tanto sentido.
+            indicadorInicial += 35; // desconsiderando valores iniciais onde os indicadores não fazem tanto sentido.
 
             TimeSeriesCollection dataset = new TimeSeriesCollection();
             //for (double percent = 0.1; percent < 1d; percent += 0.1d) {
 
             int inicioTreinamento = indicadorInicial;
-            int finalTreinamento = Math.round(((float) (indicadorFinal * 0.95d)));
+            int finalTreinamento = Math.round(((float) (indicadorFinal * 0.8d)));
             int inicioTestes = finalTreinamento + 1;
             int finalTestes = indicadorFinal;
 
@@ -67,15 +67,21 @@ public class TestsResults {
             org.jfree.data.time.TimeSeries chartDiferencas = new org.jfree.data.time.TimeSeries("Diferenca");
             for (int i = inicioTestes; i <= finalTestes; i++) {
 
-                double saida = TrainingNeuralNetwork.toPredict(vivo, i);
-                System.out.println("Saida do algoritmo: " + saida * 100);
+                double[] saida = TrainingNeuralNetwork.toPredict(vivo, i);
+                System.out.println("Saida do algoritmo: " + saida[0] * 10d + " indice: " + saida[1]);
                 System.out.println("");
                 System.out.println("Dia sendo analisado: " + timeSeries.getTick(i));
+                double im;
+                if (saida[1] > 0.5d) {
+                    im = 10d;
+                } else {
+                    im = -10d;                    
+                }
                 if (i + tradesToPredict <= finalTestes) {
-                    System.out.println("Diferença: " + ((saida * 100) - timeSeries.getTick(i + tradesToPredict).getClosePrice().toDouble()) + " Dia no futuro: " + timeSeries.getTick(i + tradesToPredict));
+                    System.out.println("Diferença: " + ((saida[0] * im + timeSeries.getTick(i + tradesToPredict).getClosePrice().toDouble()) - timeSeries.getTick(i + tradesToPredict).getClosePrice().toDouble()) + " Dia no futuro: " + timeSeries.getTick(i + tradesToPredict));
                     Tick tick = timeSeries.getTick(i + tradesToPredict);
-                    chartResultados.add(new Day(tick.getEndTime().toDate()), (saida * 100d));
-                    chartDiferencas.add(new Day(tick.getEndTime().toDate()), 10d * Math.abs((saida * 100d) - timeSeries.getTick(i + tradesToPredict).getClosePrice().toDouble()));
+                    chartResultados.add(new Day(tick.getEndTime().toDate()), (saida[0] * im + timeSeries.getTick(i + tradesToPredict).getClosePrice().toDouble()));
+                    chartDiferencas.add(new Day(tick.getEndTime().toDate()), 10d * Math.abs((saida[0] * im + timeSeries.getTick(i + tradesToPredict).getClosePrice().toDouble()) - timeSeries.getTick(i + tradesToPredict).getClosePrice().toDouble()));
                 } else {
                     System.out.println("Não tem como saber o futuro ainda!!");
                 }
