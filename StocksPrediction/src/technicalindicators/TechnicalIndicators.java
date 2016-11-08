@@ -15,6 +15,7 @@ import eu.verdelhan.ta4j.TimeSeries;
 import eu.verdelhan.ta4j.indicators.simple.ClosePriceIndicator;
 import eu.verdelhan.ta4j.indicators.trackers.EMAIndicator;
 import eu.verdelhan.ta4j.indicators.trackers.MACDIndicator;
+import eu.verdelhan.ta4j.indicators.trackers.ROCIndicator;
 import eu.verdelhan.ta4j.indicators.trackers.RSIIndicator;
 import eu.verdelhan.ta4j.indicators.trackers.SMAIndicator;
 import eu.verdelhan.ta4j.indicators.volume.OnBalanceVolumeIndicator;
@@ -42,6 +43,7 @@ public class TechnicalIndicators {
     private final EMAIndicator ema5daysN;
     private final MACDIndicator macd;
     private final RSIIndicator rsi14days;
+    private final ROCIndicator roc5days;
     private final OnBalanceVolumeIndicator obv;
 
     public TechnicalIndicators(List<HistoricalQuote> historic) {
@@ -68,6 +70,7 @@ public class TechnicalIndicators {
         this.ema5days = new EMAIndicator(closePrice, 5);
         this.ema35days = new EMAIndicator(closePrice, 35);
         this.ema5daysN = new EMAIndicator(closePrice, 5);
+        this.roc5days = new ROCIndicator(closePrice, 5);
 
     }
 
@@ -81,6 +84,10 @@ public class TechnicalIndicators {
 
     public SMAIndicator getSma4days() {
         return sma4days;
+    }
+    
+    public ROCIndicator getRoc5days() {
+        return roc5days;
     }
 
     public SMAIndicator getSma9days() {

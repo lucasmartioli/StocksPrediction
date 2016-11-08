@@ -40,7 +40,25 @@ public class PredictionNeuralNetwork {
         neuralNetwork.setNetworkType(NeuralNetworkType.MULTI_LAYER_PERCEPTRON);
 
     }
-    
+
+    public PredictionNeuralNetwork(String companySymbol, String neuralNetworkName, int inputLength, int secondLayer, int outputLength, TransferFunctionType transferFunctionType) {
+        this.inputLength = inputLength;
+        this.outputLength = outputLength;
+        fileNameNeuralNetwork = companySymbol + neuralNetworkName + ".neuralnet";
+        neuralNetwork = new MultiLayerPerceptron(transferFunctionType, inputLength, secondLayer, outputLength);
+        neuralNetwork.setNetworkType(NeuralNetworkType.MULTI_LAYER_PERCEPTRON);
+
+    }
+
+    public PredictionNeuralNetwork(String companySymbol, String neuralNetworkName, int inputLength, int secondLayer, int thirdLayer, int outputLength, TransferFunctionType transferFunctionType) {
+        this.inputLength = inputLength;
+        this.outputLength = outputLength;
+        fileNameNeuralNetwork = companySymbol + neuralNetworkName + ".neuralnet";
+        neuralNetwork = new MultiLayerPerceptron(transferFunctionType, inputLength, secondLayer, thirdLayer, outputLength);
+        neuralNetwork.setNetworkType(NeuralNetworkType.MULTI_LAYER_PERCEPTRON);
+
+    }
+
     public PredictionNeuralNetwork(String companySymbol, String neuralNetworkName, int inputLength, int outputLength) {
         this.inputLength = inputLength;
         this.outputLength = outputLength;
@@ -96,17 +114,15 @@ public class PredictionNeuralNetwork {
 
     public void toTrain(List<DataSetRow> dataSet) {
         System.out.println("Iniciando treinamento da rede " + fileNameNeuralNetwork);
-//        WeightsRandomizer randomizer = new WeightsRandomizer();
-//        Random random = new Random(Calendar.getInstance().getTimeInMillis());
-//        randomizer.setRandomGenerator(random);
-//        neuralNetwork.randomizeWeights(randomizer);
-        neuralNetwork.randomizeWeights();
-        BackPropagation learningRules = new BackPropagation();        
+        WeightsRandomizer randomizer = new WeightsRandomizer();
+        Random random = new Random(Calendar.getInstance().getTimeInMillis());
+        randomizer.setRandomGenerator(random);
+        neuralNetwork.randomizeWeights(randomizer);
+//        neuralNetwork.randomizeWeights();
+        BackPropagation learningRules = new BackPropagation();
         learningRules.setMaxIterations(maxIterationsForLearning);
         learningRules.setMaxError(maxErrorForLearning);
         learningRules.setLearningRate(learningRateForLearning);
-        
-        //learningRules.setBatchMode(true);
 
         DataSet trainingSet;
         trainingSet = new DataSet(inputLength, outputLength);
@@ -115,26 +131,25 @@ public class PredictionNeuralNetwork {
             trainingSet.addRow(row);
         }
 
-        neuralNetwork.learn(trainingSet, learningRules);        
+        neuralNetwork.learn(trainingSet, learningRules);
         neuralNetwork.save(fileNameNeuralNetwork);
         System.out.println("Rede " + fileNameNeuralNetwork + " salva em arquivo.");
     }
 
     public double[] toPredict(double[] input) {
-        System.out.println("Iniciando uso da rede " + fileNameNeuralNetwork + "." );
+        System.out.println("Iniciando uso da rede " + fileNameNeuralNetwork + ".");
         NeuralNetwork neuralNetworkLoad;
         neuralNetworkLoad = NeuralNetwork.createFromFile(fileNameNeuralNetwork);
         neuralNetworkLoad.setInput(input);
         neuralNetworkLoad.calculate();
 
-        
         System.out.print("entrada: ");
 
         for (double d : input) {
             System.out.print(d + ", ");
 
         }
-        
+
         System.out.println("");
         System.out.print("saida: ");
 
@@ -142,11 +157,11 @@ public class PredictionNeuralNetwork {
             System.out.print(d + ", ");
 
         }
-        
+
         System.out.println("");
-        System.out.println("Finalizado o uso da rede " + fileNameNeuralNetwork + "." );
-        
+        System.out.println("Finalizado o uso da rede " + fileNameNeuralNetwork + ".");
+
         return neuralNetworkLoad.getOutput();
-        
+
     }
 }
