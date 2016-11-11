@@ -22,6 +22,9 @@ public class StockValues {
     private BigDecimal low;
     private BigDecimal high;
     private BigDecimal close;
+    private BigDecimal predictedClose;
+    private BigDecimal beforeClose;
+    private Double increase;
 
     //private BigDecimal adjClose;
     private Long volume;
@@ -33,6 +36,13 @@ public class StockValues {
         this.volume = h.getVolume();
         this.high = h.getHigh();
 
+    }
+    
+    public StockValues(Calendar date, double close, double predictedClose, double beforeClose) {
+        this.date = date;        
+        this.close = new BigDecimal(close);
+        this.predictedClose = new BigDecimal(predictedClose);
+        this.beforeClose = new BigDecimal(beforeClose);
     }
 
     public StockValues(Stock consulta) {
@@ -90,4 +100,24 @@ public class StockValues {
     public void setVolume(Long volume) {
         this.volume = volume;
     }
+
+    public Double getIncrease() {
+        return increase;
+    }
+
+    public void setIncrease(Double increase) {
+        this.increase = increase;
+    }
+
+    public BigDecimal getPredictedClose() {
+        return predictedClose;
+    }
+
+    public BigDecimal getBeforeClose() {
+        return beforeClose;
+    }
+    
+    
+    
+    
 }

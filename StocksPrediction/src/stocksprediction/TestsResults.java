@@ -28,6 +28,7 @@ import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.ui.ApplicationFrame;
 import org.jfree.ui.RefineryUtilities;
 import technicalindicators.TechnicalIndicators;
+import yahoofinance.histquotes.HistoricalQuote;
 
 /**
  *
@@ -40,7 +41,7 @@ public class TestsResults {
 
         try {
             Calendar di = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
-            di.set(14, 5, 1, 12, 0);
+            di.set(14, 6, 1, 12, 0);
             Calendar df = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
             df.set(16, 10, 1, 12, 0);
 
@@ -56,7 +57,7 @@ public class TestsResults {
             TimeSeriesCollection dataset = new TimeSeriesCollection();
 
             int inicioTreinamento = indicadorInicial;
-            int finalTreinamento = Math.round(((float) (indicadorFinal * 0.90d)));
+            int finalTreinamento = Math.round(((float) (indicadorFinal * 0.88d)));
             int inicioTestes = finalTreinamento + 1;
             int finalTestes = indicadorFinal;
             

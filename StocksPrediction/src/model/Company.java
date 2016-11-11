@@ -5,6 +5,7 @@
  */
 package model;
 
+import java.util.ArrayList;
 import java.util.List;
 import technicalindicators.TechnicalIndicators;
 import yahoofinance.histquotes.HistoricalQuote;
@@ -17,9 +18,12 @@ public class Company {
 
     private final String simbolo;
     private TechnicalIndicators technicalIndicators;
-    private StockValues valoresAutais;
+    private StockValues currentValues;
+    private ArrayList<StockValues> futureValues;
 
-    private List<HistoricalQuote> historic;
+    private List<HistoricalQuote> historicValues;
+    private double normalizerValue;
+    private double variance;
 
     public Company(String simbolo) {
         this.simbolo = simbolo;
@@ -30,27 +34,69 @@ public class Company {
     }
 
     public void calculateTechnicalIndicators() {
-        this.technicalIndicators = new TechnicalIndicators(historic);
+        this.technicalIndicators = new TechnicalIndicators(historicValues);
     }
 
-    public List<HistoricalQuote> getHistoric() {
-        return historic;
+    public List<HistoricalQuote> getHistoricValues() {
+        return historicValues;
     }
 
-    public void setHistoric(List<HistoricalQuote> historic) {        
-        this.historic = historic;
+    public void setHistoricValues(List<HistoricalQuote> historicValues) {
+        this.historicValues = historicValues;
         this.calculateTechnicalIndicators();
+        this.evaluateVariance();
     }
 
     public String getSimbolo() {
         return simbolo;
     }
 
-    public StockValues getValoresAutais() {
-        return valoresAutais;
+    public StockValues getCurrentValues() {
+        return currentValues;
     }
 
-    public void setValoresAutais(StockValues valoresAutais) {
-        this.valoresAutais = valoresAutais;
+    public void setCurrentValues(StockValues currentValues) {
+        this.currentValues = currentValues;
+    }
+
+    public double getNormalizerValue() {
+        return normalizerValue;
+    }
+
+    public void setNormalizerValue(double normalizerValue) {
+        this.normalizerValue = normalizerValue;
+    }
+
+    public ArrayList<StockValues> getFutureValues() {
+        return futureValues;
+    }
+
+    public void setFutureValues(ArrayList<StockValues> futureValues) {
+        this.futureValues = futureValues;
+    }
+
+    public double getVariance() {
+        return variance;
+    }
+
+    private void evaluateVariance() {
+
+        int limit = this.getTechnicalIndicators().getTimeSeries().getEnd();
+
+        double mean = 0d;
+
+        for (int i = 0; i < limit; i++) {
+            mean += this.getTechnicalIndicators().getClosePrice().getValue(i).toDouble();
+        }
+
+        mean /= limit;
+
+        double total = 0d;
+        for (int i = 0; i < limit; i++) {
+            total = Math.pow(this.getTechnicalIndicators().getClosePrice().getValue(i).toDouble() - mean, 2);
+        }
+
+        variance = total / limit;
+
     }
 }

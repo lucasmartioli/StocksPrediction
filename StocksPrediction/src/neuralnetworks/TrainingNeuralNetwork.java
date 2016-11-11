@@ -28,31 +28,31 @@ import technicalindicators.TechnicalIndicators;
  */
 public class TrainingNeuralNetwork {
 
-    private static final int tradesForTraining = 1;
+    private static final int tradesForTraining = 5;
     private static final double INDICATIVO_TENDENCIA_ALTA = 1d;
     private static final double INDICATIVO_TENDENCIA_BAIXA = 0d;
-    private static final double INDICATIVO_TENDENCIA_LATERAL = 0.5d;   
+    private static final double INDICATIVO_TENDENCIA_LATERAL = 0.5d;
 
-    public static void toTrain(Company company, int initialIndex, int finalIndex, double normalizerValue) {       
-    
+    public static void toTrain(Company company, int initialIndex, int finalIndex, double normalizerValue) {
+
         TechnicalIndicators technicalIndicators = company.getTechnicalIndicators();
 
-        PredictionNeuralNetwork rsiNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "RSI", 3, 3, 1, TransferFunctionType.SIGMOID);
-        rsiNeuralNetwork.setLearningRateForLearning(0.525d);
-        rsiNeuralNetwork.setMaxErrorForLearning(0.001d);
-        rsiNeuralNetwork.setMaxIterationsForLearning(800);
+        PredictionNeuralNetwork rsiNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "RSI", 3, 4, 1, TransferFunctionType.SIGMOID);
+        rsiNeuralNetwork.setLearningRateForLearning(0.6d);
+        rsiNeuralNetwork.setMaxErrorForLearning(0.0001d);
+        rsiNeuralNetwork.setMaxIterationsForLearning(10000);
         rsiNeuralNetwork.toTrain(getRSIDataSetTraining(initialIndex, finalIndex, technicalIndicators));
 
-        PredictionNeuralNetwork smaNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "SMA", 2, 2, 1, TransferFunctionType.SIGMOID);
-        smaNeuralNetwork.setLearningRateForLearning(0.525d);
-        smaNeuralNetwork.setMaxErrorForLearning(0.001d);
-        smaNeuralNetwork.setMaxIterationsForLearning(800);
+        PredictionNeuralNetwork smaNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "SMA", 2, 3, 1, TransferFunctionType.SIGMOID);
+        smaNeuralNetwork.setLearningRateForLearning(0.6d);
+        smaNeuralNetwork.setMaxErrorForLearning(0.0001d);
+        smaNeuralNetwork.setMaxIterationsForLearning(10000);
         smaNeuralNetwork.toTrain(getSMADataSetTraining(initialIndex, finalIndex, technicalIndicators));
 
-        PredictionNeuralNetwork macdNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "MACD", 2, 1, TransferFunctionType.SIGMOID);
-        macdNeuralNetwork.setLearningRateForLearning(0.525d);
-        macdNeuralNetwork.setMaxErrorForLearning(0.001d);
-        macdNeuralNetwork.setMaxIterationsForLearning(800);
+        PredictionNeuralNetwork macdNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "MACD", 2, 3, 1, TransferFunctionType.SIGMOID);
+        macdNeuralNetwork.setLearningRateForLearning(0.6d);
+        macdNeuralNetwork.setMaxErrorForLearning(0.0001d);
+        macdNeuralNetwork.setMaxIterationsForLearning(10000);
         macdNeuralNetwork.toTrain(getMACDDataSetTraining(initialIndex, finalIndex, technicalIndicators));
 
         PredictionNeuralNetwork obvNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "OBV", 3, 1, TransferFunctionType.SIGMOID);
@@ -66,7 +66,7 @@ public class TrainingNeuralNetwork {
         macdNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "MACD");
         obvNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "OBV");
 
-        PredictionNeuralNetwork prediction = new PredictionNeuralNetwork(company.getSimbolo(), "PREDICTION", 11, 23, 1, TransferFunctionType.SIGMOID);
+        PredictionNeuralNetwork prediction = new PredictionNeuralNetwork(company.getSimbolo(), "PREDICTION", 9, 19, 1, TransferFunctionType.SIGMOID);
         prediction.setLearningRateForLearning(0.6d);
         prediction.setMaxErrorForLearning(0.0001d);
         prediction.setMaxIterationsForLearning(10000);
@@ -103,7 +103,7 @@ public class TrainingNeuralNetwork {
         OnBalanceVolumeIndicator obv = technicalIndicators.getObv();
         EMAIndicator ema5 = technicalIndicators.getEma5days();
         EMAIndicator ema35 = technicalIndicators.getEma35days();
-        double[] rsiResult = rsiNeuralNetwork.toPredict(getInputToRSINeuralNetwork(technicalIndicators, index - 2 ));
+        double[] rsiResult = rsiNeuralNetwork.toPredict(getInputToRSINeuralNetwork(technicalIndicators, index - 2));
 //        double[] rsiResult2 = rsiNeuralNetwork.toPredict(getInputToRSINeuralNetwork(technicalIndicators, index - 5));
 //        double[] rsiResult3 = rsiNeuralNetwork.toPredict(getInputToRSINeuralNetwork(technicalIndicators, index - 2));
         double[] smaResult = smaNeuralNetwork.toPredict(getInputToSMANeuralNetwork(technicalIndicators, index));
@@ -115,9 +115,9 @@ public class TrainingNeuralNetwork {
 //        double[] obvResult = obvNeuralNetwork.toPredict(getInputToOBVNeuralNetwork(technicalIndicators, index));
 
         double obvResult = INDICATIVO_TENDENCIA_LATERAL;
-        if (obv.getValue(index).toDouble() > obv.getValue(index - 1).toDouble() ) {
+        if (obv.getValue(index).toDouble() > obv.getValue(index - 1).toDouble()) {
             obvResult = INDICATIVO_TENDENCIA_ALTA;
-        } else if (obv.getValue(index).toDouble() < obv.getValue(index - 1).toDouble() ) {
+        } else if (obv.getValue(index).toDouble() < obv.getValue(index - 1).toDouble()) {
             obvResult = INDICATIVO_TENDENCIA_BAIXA;
         }
 
@@ -132,21 +132,19 @@ public class TrainingNeuralNetwork {
         System.err.println("Preco Atual: " + closePriceIndicator.getValue(index).toDouble());
 //        System.out.println("Preco Futuro: " + closePriceIndicator.getValue(index + tradesForTraining).toDouble());
 //,            
-        double[] input = {            
-            normalizePriceInput(closePriceIndicator.getTimeSeries().getTick(index).getOpenPrice().toDouble(), normalizerValue),            
+        double[] input = {
+            normalizePriceInput(closePriceIndicator.getTimeSeries().getTick(index).getOpenPrice().toDouble(), normalizerValue),
             normalizePriceInput(closePriceIndicator.getTimeSeries().getTick(index).getMinPrice().toDouble(), normalizerValue),
-            normalizePriceInput(closePriceIndicator.getTimeSeries().getTick(index).getMaxPrice().toDouble(), normalizerValue),            
+            normalizePriceInput(closePriceIndicator.getTimeSeries().getTick(index).getMaxPrice().toDouble(), normalizerValue),
             normalizePriceInput(closePriceIndicator.getValue(index).toDouble(), normalizerValue),
-            normalizePriceInput(technicalIndicators.getEma5days().getValue(index).toDouble(), normalizerValue),
-            normalizePriceInput(technicalIndicators.getEma35days().getValue(index).toDouble(), normalizerValue),
-            closePriceIndicator.getTimeSeries().getTick(index).isBearish()? 0d : 1d,
+            closePriceIndicator.getTimeSeries().getTick(index).isBearish() ? 0d : 1d,
             obvResult,
             macdResult[0],
             smaResult[0],
-            //rsiResult[0],
-            technicalIndicators.getRoc5days().getValue(index).toDouble() / 100d
+            rsiResult[0]//,
+        //technicalIndicators.getRoc5days().getValue(index).toDouble() / 100d
         };
-        
+
         return input;
     }
 
@@ -204,6 +202,11 @@ public class TrainingNeuralNetwork {
         } else if (rsi14days.getValue(index).toDouble() >= 70 || rsi14days.getValue(index - 1).toDouble() >= 70 || rsi14days.getValue(index - 2).toDouble() >= 70) {
             result = INDICATIVO_TENDENCIA_BAIXA;
         }
+//        if (technicalIndicators.getClosePrice().getValue(index).toDouble() < technicalIndicators.getClosePrice().getValue(index + tradesForTraining).toDouble()) {
+//            result = INDICATIVO_TENDENCIA_ALTA;
+//        } else if (technicalIndicators.getClosePrice().getValue(index).toDouble() > technicalIndicators.getClosePrice().getValue(index + tradesForTraining).toDouble()) {
+//            result = INDICATIVO_TENDENCIA_BAIXA;
+//        }
 
         double[] output = {result};
 
@@ -296,6 +299,12 @@ public class TrainingNeuralNetwork {
             }
         }
 
+//        if (technicalIndicators.getClosePrice().getValue(index).toDouble() < technicalIndicators.getClosePrice().getValue(index + tradesForTraining).toDouble()) {
+//            result = INDICATIVO_TENDENCIA_ALTA;
+//        } else if (technicalIndicators.getClosePrice().getValue(index).toDouble() < technicalIndicators.getClosePrice().getValue(index + tradesForTraining).toDouble()) {
+//            result = INDICATIVO_TENDENCIA_BAIXA;
+//        }
+
         double[] output = {result};
 
         return output;
@@ -345,6 +354,12 @@ public class TrainingNeuralNetwork {
             signal = INDICATIVO_TENDENCIA_BAIXA;
         }
 
+//        if (technicalIndicators.getClosePrice().getValue(index).toDouble() < technicalIndicators.getClosePrice().getValue(index + tradesForTraining).toDouble()) {
+//            signal = INDICATIVO_TENDENCIA_ALTA;
+//        } else if (technicalIndicators.getClosePrice().getValue(index).toDouble() < technicalIndicators.getClosePrice().getValue(index + tradesForTraining).toDouble()) {
+//            signal = INDICATIVO_TENDENCIA_BAIXA;
+//        }
+
         double[] output = {signal};
 
         return output;
@@ -384,5 +399,17 @@ public class TrainingNeuralNetwork {
         BigDecimal bd = new BigDecimal(macdValue / 10d);
         bd.setScale(4, RoundingMode.HALF_EVEN);
         return bd.doubleValue();
+    }
+    
+    public static double getMaxPrice(TechnicalIndicators technicalIndicators) {
+        double max = 0;
+
+        for (int i = technicalIndicators.getTimeSeries().getBegin(); i <= technicalIndicators.getTimeSeries().getEnd(); i++) {
+            if (technicalIndicators.getClosePrice().getTimeSeries().getTick(i).getMaxPrice().toDouble() > max) {
+                max = technicalIndicators.getClosePrice().getTimeSeries().getTick(i).getMaxPrice().toDouble();
+            }
+        }
+
+        return max;
     }
 }

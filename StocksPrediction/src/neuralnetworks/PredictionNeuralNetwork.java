@@ -5,6 +5,7 @@
  */
 package neuralnetworks;
 
+import java.io.File;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
@@ -113,6 +114,10 @@ public class PredictionNeuralNetwork {
     }
 
     public void toTrain(List<DataSetRow> dataSet) {
+        File f = new File(fileNameNeuralNetwork);
+        if (f.exists())
+            return;
+                    
         System.out.println("Iniciando treinamento da rede " + fileNameNeuralNetwork);
         WeightsRandomizer randomizer = new WeightsRandomizer();
         Random random = new Random(Calendar.getInstance().getTimeInMillis());

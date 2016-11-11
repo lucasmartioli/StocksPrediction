@@ -21,7 +21,7 @@ import yahoofinance.histquotes.Interval;
  * @author Lucas
  */
 public class LoadingCompany {
-    
+
     private static final String commonSuffix = ".SA";
 
     public static ArrayList<Company> loading(String[] listaEmpresas, Calendar dataInicial, Calendar dataFinal) throws IOException {
@@ -37,7 +37,7 @@ public class LoadingCompany {
 
             Company company = new Company(simbolo);
 
-            company.setHistoric(value.getHistory());
+            company.setHistoricValues(value.getHistory());
             empresas.add(company);
         }
 
@@ -48,10 +48,20 @@ public class LoadingCompany {
 
         YahooFinance.logger.setLevel(Level.OFF);
         Stock consulta = YahooFinance.get(symbol + commonSuffix, dataInicial, dataFinal, Interval.DAILY);
-        
 
         Company company = new Company(symbol);
-        company.setHistoric(consulta.getHistory());
+        company.setHistoricValues(consulta.getHistory());
+
+        return company;
+    }
+    
+     public static Company loadingCoin(String symbol, Calendar dataInicial, Calendar dataFinal) throws IOException {
+
+        YahooFinance.logger.setLevel(Level.OFF);
+        Stock consulta = YahooFinance.get(symbol, dataInicial, dataFinal, Interval.DAILY);
+
+        Company company = new Company(symbol);
+        company.setHistoricValues(consulta.getHistory());
 
         return company;
     }
@@ -60,11 +70,24 @@ public class LoadingCompany {
 
         YahooFinance.logger.setLevel(Level.OFF);
         Stock consulta = YahooFinance.get(empresa + commonSuffix);
-        
+
         StockValues sv = new StockValues(consulta);
- 
+
         Company company = new Company(empresa);
-        company.setValoresAutais(sv);
+        company.setCurrentValues(sv);
+
+        return company;
+    }
+
+    public static Company loadingCoin(String empresa) throws IOException {
+
+        YahooFinance.logger.setLevel(Level.OFF);
+        Stock consulta = YahooFinance.get(empresa);
+
+        StockValues sv = new StockValues(consulta);
+
+        Company company = new Company(empresa);
+        company.setCurrentValues(sv);
 
         return company;
     }
