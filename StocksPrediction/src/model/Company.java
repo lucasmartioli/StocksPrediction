@@ -99,4 +99,11 @@ public class Company {
         variance = total / limit;
 
     }
+
+    @Override
+    public String toString() {
+        return "Company{" + "simbolo=" + simbolo + ", futureValues=" + futureValues + ", normalizerValue=" + normalizerValue + ", variance=" + variance + '}';
+    }
+    
+    
 }

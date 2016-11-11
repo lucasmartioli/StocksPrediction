@@ -16,11 +16,13 @@ public class Ativo implements Comparable<Ativo> {
     private final String symbol;
     private final StockValues values;
     private final double variance;
+    private final double participation;
 
-    public Ativo(String symbol, StockValues values, double variance) {
+    public Ativo(String symbol, StockValues values, double variance, double participation) {
         this.symbol = symbol;
         this.values = values;
         this.variance = variance;
+        this.participation = participation;
     }
 
     public String getSymbol() {
@@ -37,14 +39,7 @@ public class Ativo implements Comparable<Ativo> {
 
     @Override
     public int compareTo(Ativo t) {
-
-        if (variance > t.getVariance() || values.getIncrease() > t.getValues().getIncrease()) {
-            return 1;
-        } else if (variance < t.getVariance() || values.getIncrease() < t.getValues().getIncrease()) {
-            return -1;
-        }
-
-        return 0;
+        return Double.compare(values.getIncrease() + variance, t.getValues().getIncrease() + t.getVariance());
     }
 
     @Override

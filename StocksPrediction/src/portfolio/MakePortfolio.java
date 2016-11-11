@@ -34,7 +34,7 @@ public class MakePortfolio {
     private ArrayList<Company> companies;
     private final Period period;
     private final int portfolioSize = 4;
-    private final int tradesToPredict = 5;
+    private final int tradesToPredict = 1;
 
     public MakePortfolio(ArrayList<String> companySymbols, Period period, int portfolioSize) {
         this.companySymbols = companySymbols;
@@ -49,31 +49,43 @@ public class MakePortfolio {
 
         this.testsNNs();
 
+        for (Company c : companies) {
+            System.out.println(c.toString());
+
+        }
+
         int indexFutureValues = 0;
         boolean finalizou = false;
         portfolios = new ArrayList<>();
         while (true) {
             ArrayList<Ativo> ativosDoDia = new ArrayList<>();
-            
+            System.out.println("Index: " + indexFutureValues);
+
             for (Company company : companies) {
                 finalizou = indexFutureValues >= company.getFutureValues().size();
-                if (finalizou)
+                if (finalizou) {
+                    System.out.println("Size: " + company.getFutureValues().size() + " " + company.toString());
                     break;
-                
-                Ativo a = new Ativo(company.getSimbolo(), company.getFutureValues().get(indexFutureValues), company.getVariance());
+                }
+
+                Ativo a = new Ativo(company.getSimbolo(), company.getFutureValues().get(indexFutureValues), company.getVariance(), 100/portfolioSize);
                 ativosDoDia.add(a);
             }
-            
-            if (finalizou)
-                break;
 
-            Collections.sort(ativosDoDia);
-            Portfolio portfolio = new Portfolio();
-            for (int i = 0; i < portfolioSize; i++) {
-                portfolio.addAtivo(ativosDoDia.get(i));
+            if (finalizou) {
+                break;
             }
-            portfolios.add(portfolio);
-            indexFutureValues++;
+            
+            
+//            System.out.println("Ativos do dia: ");
+//            for (Ativo ativo : ativosDoDia) {
+//                System.out.println(ativo);
+//                
+//            }
+
+            GeneticPortfolio geneticPortfolio = new GeneticPortfolio(portfolioSize, ativosDoDia);            
+            portfolios.add(geneticPortfolio.generate());
+            indexFutureValues+=tradesToPredict;
         }
     }
 
@@ -100,7 +112,6 @@ public class MakePortfolio {
             System.out.println("Inicio Treinamento: " + inicioTreinamento + " Final Treinamento: " + finalTreinamento + " Inicio testes: " + inicioTestes + " Final Testes: " + finalTestes);
 
             TrainingNeuralNetwork.toTrain(company, inicioTreinamento, finalTreinamento, company.getNormalizerValue());
-
             double anteriorCalculado = 0d;
             double anteriorReal = 0d;
             double totalTests = 0d;

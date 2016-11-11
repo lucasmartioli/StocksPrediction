@@ -6,11 +6,21 @@
 package portfolio;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.data.time.Day;
+import org.jfree.data.time.TimeSeriesCollection;
+import org.jfree.ui.ApplicationFrame;
+import org.jfree.ui.RefineryUtilities;
 
 /**
  *
@@ -21,6 +31,10 @@ public class PortfolioEficiente {
     public static void main(String[] args) {
         ArrayList<String> companies = new ArrayList<>();
 
+        companies.add("ENBR3");
+        companies.add("CPLE6");
+        companies.add("CSNA3");
+//        companies.add("CEGR3"); NaN Dados?
         companies.add("ABEV3");
         companies.add("ITUB4");
         companies.add("PETR3");
@@ -36,12 +50,12 @@ public class PortfolioEficiente {
         companies.add("JBSS3");
         companies.add("UGPA3");
         companies.add("FIBR3");
-        companies.add("KLBN3");
+//        companies.add("KLBN3"); Dados insuficientes
         companies.add("WEGE3");
         companies.add("EMBR3");
         companies.add("CCRO3");
         companies.add("CCRO3");
-        companies.add("EGIE3");
+//        companies.add("EGIE3"); Não tem dados no Yahoo
         companies.add("SUZB5");
         companies.add("LAME4");
         companies.add("BVMF3");
@@ -65,12 +79,8 @@ public class PortfolioEficiente {
         companies.add("EQTL3");
         companies.add("SMLE3");
         companies.add("MPLU3");
-        companies.add("CPRE3");
-        companies.add("TAEE3");
-        companies.add("ENBR3");
-        companies.add("CPLE6");
-        companies.add("CSNA3");
-        companies.add("CEGR3");
+//        companies.add("CPRE3"); Problemas na rede RSI
+//        companies.add("TAEE3"); Sem indicadores
 
 //        companies.add("KROT3");
 //        companies.add("CSAN3");
@@ -94,6 +104,7 @@ public class PortfolioEficiente {
         di.set(14, 6, 1, 12, 0);
         Calendar df = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
         df.set(16, 10, 1, 12, 0);
+        TimeSeriesCollection dataset = new TimeSeriesCollection();
 
         Period period = new Period(di, df, 0.90, 0.10);
 
@@ -105,10 +116,57 @@ public class PortfolioEficiente {
             Logger.getLogger(PortfolioEficiente.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+        org.jfree.data.time.TimeSeries chartProfit = new org.jfree.data.time.TimeSeries("Profit");
+        org.jfree.data.time.TimeSeries chartEstimatedProfit = new org.jfree.data.time.TimeSeries("Estimated Profit");
+        org.jfree.data.time.TimeSeries chartInvestiment = new org.jfree.data.time.TimeSeries("Investiment");
+
         for (Portfolio p : makePortfolio.getPortfolios()) {
             System.out.println(p.toString());
+            chartProfit.addOrUpdate(new Day(p.getDate().getTime()), p.getProfit());
+            chartEstimatedProfit.addOrUpdate(new Day(p.getDate().getTime()), p.getEstimatedProfit());
+            chartInvestiment.addOrUpdate(new Day(p.getDate().getTime()), p.getInvestment());
         }
 
+        dataset.addSeries(chartProfit);
+        dataset.addSeries(chartEstimatedProfit);
+        dataset.addSeries(chartInvestiment);
+
+        /**
+         * Creating the chart
+         */
+        JFreeChart chart = ChartFactory.createTimeSeriesChart(
+                "Portfolios", // title
+                "Date", // x-axis label
+                "R$", // y-axis label
+                dataset, // data
+                true, // create legend?
+                true, // generate tooltips?
+                false // generate URLs?
+        );
+        XYPlot plot = (XYPlot) chart.getPlot();
+        DateAxis axis = (DateAxis) plot.getDomainAxis();
+        axis.setDateFormatOverride(new SimpleDateFormat("dd-MM-yyyy"));
+
+        displayChart(chart);
+
+    }
+
+    private static void displayChart(JFreeChart chart) {
+
+        //http://www.jfree.org/jfreechart/api/javadoc/org/jfree/chart/plot/CombinedDomainCategoryPlot.html
+        //http://www.java2s.com/Code/Java/Chart/JFreeChartCombinedCategoryPlotDemo1.htm
+        // Chart panel
+        ChartPanel panel = new ChartPanel(chart);
+        panel.setFillZoomRectangle(true);
+        panel.setMouseWheelEnabled(true);
+        panel.setPreferredSize(new java.awt.Dimension(500, 270));
+        // Application frame
+        ApplicationFrame frame = new ApplicationFrame("Testes");
+
+        frame.setContentPane(panel);
+        frame.pack();
+        RefineryUtilities.centerFrameOnScreen(frame);
+        frame.setVisible(true);
     }
 
 }

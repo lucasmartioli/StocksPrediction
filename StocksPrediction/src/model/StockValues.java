@@ -37,9 +37,9 @@ public class StockValues {
         this.high = h.getHigh();
 
     }
-    
+
     public StockValues(Calendar date, double close, double predictedClose, double beforeClose) {
-        this.date = date;        
+        this.date = date;
         this.close = new BigDecimal(close);
         this.predictedClose = new BigDecimal(predictedClose);
         this.beforeClose = new BigDecimal(beforeClose);
@@ -116,8 +116,10 @@ public class StockValues {
     public BigDecimal getBeforeClose() {
         return beforeClose;
     }
-    
-    
-    
-    
+
+    @Override
+    public String toString() {
+        return "StockValues{" + "date=" + date.getTime() + ", open=" + open + ", low=" + low + ", high=" + high + ", close=" + close + ", predictedClose=" + predictedClose + ", beforeClose=" + beforeClose + ", increase=" + increase + '}';
+    }
+
 }
