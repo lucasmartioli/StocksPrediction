@@ -16,13 +16,17 @@ public class Ativo implements Comparable<Ativo> {
     private final String symbol;
     private final StockValues values;
     private final double variance;
-    private final double participation;
+    private final double accuracy;
 
-    public Ativo(String symbol, StockValues values, double variance, double participation) {
+    public Ativo(String symbol, StockValues values, double variance, double accuracy) {
         this.symbol = symbol;
         this.values = values;
         this.variance = variance;
-        this.participation = participation;
+        this.accuracy = accuracy;
+    }
+
+    public double getAccuracy() {
+        return accuracy;
     }
 
     public String getSymbol() {
@@ -44,7 +48,10 @@ public class Ativo implements Comparable<Ativo> {
 
     @Override
     public String toString() {
-        return "Ativo{" + "symbol=" + symbol + ", values=" + values + ", variance=" + variance + '}';
+        return "Ativo{\n"
+                + "symbol=" + symbol + "\n"
+                + ", values=" + values + "\n"
+                + ", variance=" + variance + '}';
     }
 
 }

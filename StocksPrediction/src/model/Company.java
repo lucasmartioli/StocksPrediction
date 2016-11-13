@@ -20,6 +20,7 @@ public class Company {
     private TechnicalIndicators technicalIndicators;
     private StockValues currentValues;
     private ArrayList<StockValues> futureValues;
+    private double accuracy;
 
     private List<HistoricalQuote> historicValues;
     private double normalizerValue;
@@ -67,6 +68,14 @@ public class Company {
         this.normalizerValue = normalizerValue;
     }
 
+    public double getAccuracy() {
+        return accuracy;
+    }
+
+    public void setAccuracy(double accuracy) {
+        this.accuracy = accuracy;
+    }
+
     public ArrayList<StockValues> getFutureValues() {
         return futureValues;
     }
@@ -93,7 +102,7 @@ public class Company {
 
         double total = 0d;
         for (int i = 0; i < limit; i++) {
-            total = Math.pow(this.getTechnicalIndicators().getClosePrice().getValue(i).toDouble() - mean, 2);
+            total += Math.pow(getTechnicalIndicators().getClosePrice().getValue(i).toDouble() - mean, 2);
         }
 
         variance = total / limit;
@@ -104,6 +113,5 @@ public class Company {
     public String toString() {
         return "Company{" + "simbolo=" + simbolo + ", futureValues=" + futureValues + ", normalizerValue=" + normalizerValue + ", variance=" + variance + '}';
     }
-    
-    
+
 }

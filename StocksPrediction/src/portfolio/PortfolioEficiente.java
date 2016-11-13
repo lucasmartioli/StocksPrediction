@@ -78,6 +78,16 @@ public class PortfolioEficiente {
         companies.add("MULT3");
         companies.add("EQTL3");
         companies.add("SMLE3");
+        companies.add("SMTO3");
+        companies.add("SMTO3");
+        companies.add("RENT3");
+        companies.add("TOTS3");
+        companies.add("GRND3");
+        companies.add("ODPV3");
+        companies.add("CGAS5");
+        companies.add("ESTC3");
+        companies.add("SMLE3");
+        companies.add("CESP6");
         companies.add("MPLU3");
 //        companies.add("CPRE3"); Problemas na rede RSI
 //        companies.add("TAEE3"); Sem indicadores
@@ -117,19 +127,40 @@ public class PortfolioEficiente {
         }
 
         org.jfree.data.time.TimeSeries chartProfit = new org.jfree.data.time.TimeSeries("Profit");
+        org.jfree.data.time.TimeSeries chartID = new org.jfree.data.time.TimeSeries("ID");
         org.jfree.data.time.TimeSeries chartEstimatedProfit = new org.jfree.data.time.TimeSeries("Estimated Profit");
         org.jfree.data.time.TimeSeries chartInvestiment = new org.jfree.data.time.TimeSeries("Investiment");
+        org.jfree.data.time.TimeSeries chartVariance = new org.jfree.data.time.TimeSeries("Variance");
 
+        double investimento = 0d;
+        double investimentoLiq = 0d;
+        double lucro = 0d;
+        double lucroLiq = 0d;
         for (Portfolio p : makePortfolio.getPortfolios()) {
-            System.out.println(p.toString());
+            if (p.getEstimatedProfit() > 0) {
+                lucroLiq += p.getProfit();
+                investimento += p.getInvestment();
+            }
+
+            lucro += p.getProfit();
+            investimentoLiq += p.getInvestment();
+            
+//            System.out.println(p.toString());
+            System.out.println(p.toStringResum());
             chartProfit.addOrUpdate(new Day(p.getDate().getTime()), p.getProfit());
+            chartID.addOrUpdate(new Day(p.getDate().getTime()), p.getId());
             chartEstimatedProfit.addOrUpdate(new Day(p.getDate().getTime()), p.getEstimatedProfit());
             chartInvestiment.addOrUpdate(new Day(p.getDate().getTime()), p.getInvestment());
+            chartVariance.addOrUpdate(new Day(p.getDate().getTime()), p.getVariance());
         }
+        System.out.println("Lucro: " + lucro + "(ou prejuizo) e lucro liquido: " + lucroLiq);
+        System.out.println("Lucro %: " + (lucro/investimento) * 100d + "(ou prejuizo) e lucro liquido %: " + (lucroLiq/investimentoLiq) * 100d);
 
         dataset.addSeries(chartProfit);
         dataset.addSeries(chartEstimatedProfit);
-        dataset.addSeries(chartInvestiment);
+//        dataset.addSeries(chartInvestiment);
+        dataset.addSeries(chartVariance);
+//        dataset.addSeries(chartID);
 
         /**
          * Creating the chart
