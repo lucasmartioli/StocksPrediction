@@ -24,6 +24,7 @@ public class Portfolio {
     private double profit;
     private double estimatedProfit;
     private double variance;
+    private double covariance;
     private double accuracy;
     private HashMap<String, Integer> amountsAtivos;
 
@@ -41,7 +42,9 @@ public class Portfolio {
 
     public void addAtivo(Ativo a) {
         ativos.add(a);
-        amountsAtivos.put(a.getSymbol(), 1);
+        if (!amountsAtivos.containsKey(a.getSymbol())) {
+            setAmoutForAtivo(a, 1);
+        }
         evaluateProfit();
     }
 
@@ -49,13 +52,18 @@ public class Portfolio {
         amountsAtivos.put(a.getSymbol(), amount);
     }
 
-    public void replaceAtivo(Ativo a, int index) {
-        ativos.set(index, a);
-        evaluateProfit();
-    }
-
+//    public void replaceAtivo(Ativo a, int index) {
+//        setAmoutForAtivo(ativos.get(index), 0);
+//        setAmoutForAtivo(a, 1);
+//        ativos.set(index, a);
+//        evaluateProfit();
+//    }
     public Calendar getDate() {
         return ativos.get(0).getValues().getDate();
+    }
+
+    public Integer getAmount(Ativo a) {
+        return amountsAtivos.get(a.getSymbol());
     }
 
     public double getAccuracy() {
@@ -63,17 +71,28 @@ public class Portfolio {
     }
 
     private void evaluateProfit() {
-        accuracy = variance = estimatedProfit = investment = profit = 0;
+        covariance = accuracy = variance = estimatedProfit = investment = profit = 0;
+
+        int t = 0;
+//        int totalDeAtivos = 0;
+//        for (Map.Entry<String, Integer> entry : amountsAtivos.entrySet()) {
+//            totalDeAtivos += entry.getValue();
+//            if (entry.getValue() > 0) {
+//                
+//            }
+//        }
 
         for (Ativo ativo : ativos) {
-            profit += (ativo.getValues().getClose().doubleValue() - ativo.getValues().getBeforeClose().doubleValue()) * amountsAtivos.get(ativo.getSymbol());
-            estimatedProfit += (ativo.getValues().getPredictedClose().doubleValue() - ativo.getValues().getBeforeClose().doubleValue()) * amountsAtivos.get(ativo.getSymbol());
+            profit += ((ativo.getValues().getClose().doubleValue() - ativo.getValues().getBeforeClose().doubleValue())) * amountsAtivos.get(ativo.getSymbol());
+            estimatedProfit += ((ativo.getValues().getPredictedClose().doubleValue() - ativo.getValues().getBeforeClose().doubleValue()) / ativo.getValues().getBeforeClose().doubleValue()) * amountsAtivos.get(ativo.getSymbol());
             investment += ativo.getValues().getBeforeClose().doubleValue() * amountsAtivos.get(ativo.getSymbol());
             variance += ativo.getVariance() * amountsAtivos.get(ativo.getSymbol());
             accuracy += ativo.getAccuracy() * amountsAtivos.get(ativo.getSymbol());
+            t++;
         }
-        accuracy /= ativos.size();
-        variance /= ativos.size();
+
+        accuracy /= t;
+        variance /= t;
     }
 
     public double getProfit() {
@@ -111,7 +130,7 @@ public class Portfolio {
     public String toStringResum() {
         String r = "Portfolio id: " + id + "\n"
                 + "Data: " + ativos.get(1).getValues().getDate().getTime() + "\n"
-                + "Percentual lucro: " + (getProfit()/getInvestment()) * 100 + "%\n"
+                + "Percentual lucro: " + (getProfit() / getInvestment()) * 100 + "%\n"
                 + "Ativos:\n";
 
         for (Map.Entry<String, Integer> entry : amountsAtivos.entrySet()) {

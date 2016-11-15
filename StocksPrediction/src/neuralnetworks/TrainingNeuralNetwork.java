@@ -66,7 +66,7 @@ public class TrainingNeuralNetwork {
         macdNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "MACD");
         obvNeuralNetwork = new PredictionNeuralNetwork(company.getSimbolo(), "OBV");
 
-        PredictionNeuralNetwork prediction = new PredictionNeuralNetwork(company.getSimbolo(), "PREDICTION", 9, 19, 1, TransferFunctionType.SIGMOID);
+        PredictionNeuralNetwork prediction = new PredictionNeuralNetwork(company.getSimbolo(), "PREDICTION", 8, 17, 1, TransferFunctionType.SIGMOID);
         prediction.setLearningRateForLearning(0.6d);
         prediction.setMaxErrorForLearning(0.0001d);
         prediction.setMaxIterationsForLearning(10000);
@@ -122,14 +122,14 @@ public class TrainingNeuralNetwork {
         }
 
         double trendIndicator = INDICATIVO_TENDENCIA_LATERAL;
-        System.out.println("Sequencia de precos: " + closePriceIndicator.getValue(index - 2).toDouble() + ", " + closePriceIndicator.getValue(index - 1).toDouble() + ", " + closePriceIndicator.getValue(index).toDouble());
+//        System.out.println("Sequencia de precos: " + closePriceIndicator.getValue(index - 2).toDouble() + ", " + closePriceIndicator.getValue(index - 1).toDouble() + ", " + closePriceIndicator.getValue(index).toDouble());
         if (closePriceIndicator.getValue(index).toDouble() >= closePriceIndicator.getValue(index - 1).toDouble() && closePriceIndicator.getValue(index - 1).toDouble() >= closePriceIndicator.getValue(index - 2).toDouble()) {
             trendIndicator = INDICATIVO_TENDENCIA_ALTA;
         } else if (closePriceIndicator.getValue(index).toDouble() < closePriceIndicator.getValue(index - 1).toDouble() && closePriceIndicator.getValue(index - 1).toDouble() < closePriceIndicator.getValue(index - 2).toDouble()) {
             trendIndicator = INDICATIVO_TENDENCIA_BAIXA;
         }
 
-        System.err.println("Preco Atual: " + closePriceIndicator.getValue(index).toDouble());
+//        System.err.println("Preco Atual: " + closePriceIndicator.getValue(index).toDouble());
 //        System.out.println("Preco Futuro: " + closePriceIndicator.getValue(index + tradesForTraining).toDouble());
 //,            
         double[] input = {
@@ -137,8 +137,7 @@ public class TrainingNeuralNetwork {
             normalizePriceInput(closePriceIndicator.getTimeSeries().getTick(index).getMinPrice().toDouble(), normalizerValue),
             normalizePriceInput(closePriceIndicator.getTimeSeries().getTick(index).getMaxPrice().toDouble(), normalizerValue),
             normalizePriceInput(closePriceIndicator.getValue(index).toDouble(), normalizerValue),
-            closePriceIndicator.getTimeSeries().getTick(index).isBearish() ? 0d : 1d,
-            obvResult,
+            closePriceIndicator.getTimeSeries().getTick(index).isBearish() ? 0d : 1d,            
             macdResult[0],
             smaResult[0],
             rsiResult[0]//,
@@ -375,7 +374,7 @@ public class TrainingNeuralNetwork {
             convertedSignal = INDICATIVO_TENDENCIA_ALTA;
         }
 
-        System.out.println("Sinal para converter: " + signal + " convertido para: " + convertedSignal);
+//        System.out.println("Sinal para converter: " + signal + " convertido para: " + convertedSignal);
 
         return convertedSignal;
 

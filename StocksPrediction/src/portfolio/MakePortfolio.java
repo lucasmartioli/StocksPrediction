@@ -33,12 +33,13 @@ public class MakePortfolio {
     private ArrayList<Portfolio> portfolios;
     private ArrayList<Company> companies;
     private final Period period;
-    private final int portfolioSize = 11;
+    private final int portfolioSize;
     private final int tradesToPredict = 1;
 
     public MakePortfolio(ArrayList<String> companySymbols, Period period, int portfolioSize) {
         this.companySymbols = companySymbols;
         this.period = period;
+        this.portfolioSize = portfolioSize;
     }
 
     public ArrayList<Portfolio> getPortfolios() {
@@ -53,12 +54,12 @@ public class MakePortfolio {
         boolean finalizou = false;
         portfolios = new ArrayList<>();
         while (true) {
-            ArrayList<Ativo> ativosDoDia = new ArrayList<>();            
+            ArrayList<Ativo> ativosDoDia = new ArrayList<>();
 
             for (Company company : companies) {
                 finalizou = indexFutureValues >= company.getFutureValues().size();
                 if (finalizou) {
-                    
+
                     break;
                 }
 
@@ -69,17 +70,15 @@ public class MakePortfolio {
             if (finalizou) {
                 break;
             }
-            
-            
+
 //            System.out.println("Ativos do dia: ");
 //            for (Ativo ativo : ativosDoDia) {
 //                System.out.println(ativo);
 //                
 //            }
-
-            GeneticPortfolio geneticPortfolio = new GeneticPortfolio(portfolioSize, ativosDoDia);            
+            GeneticPortfolio geneticPortfolio = new GeneticPortfolio(portfolioSize, ativosDoDia);
             portfolios.add(geneticPortfolio.generate());
-            indexFutureValues+=tradesToPredict;
+            indexFutureValues += tradesToPredict;
         }
     }
 
@@ -103,38 +102,42 @@ public class MakePortfolio {
             int inicioTestes = finalTreinamento + 1;
             int finalTestes = Math.round(((float) (indicadorFinal * 1 - period.getPercentageToTest())));
 
-            System.out.println("Inicio Treinamento: " + inicioTreinamento + " Final Treinamento: " + finalTreinamento + " Inicio testes: " + inicioTestes + " Final Testes: " + finalTestes);
+//            System.out.println("Inicio Treinamento: " + inicioTreinamento + " Final Treinamento: " + finalTreinamento + " Inicio testes: " + inicioTestes + " Final Testes: " + finalTestes);
 
             TrainingNeuralNetwork.toTrain(company, inicioTreinamento, finalTreinamento, company.getNormalizerValue());
             double anteriorCalculado = 0d;
             double anteriorReal = 0d;
             double totalTests = 0d;
             double acerto = 0d;
-            double diferencaTotal = 0d;
+            int indexEndAccuracy = inicioTestes + Math.round(((float) ((finalTestes - inicioTestes ) * 0.7)));
             ArrayList<StockValues> futureValues = new ArrayList<>();
 
             for (int i = inicioTestes; i <= finalTestes - tradesToPredict; i++) {
 
-                double saida = TrainingNeuralNetwork.toPredict(company, i, company.getNormalizerValue());
                 Tick tick = timeSeries.getTick(i + tradesToPredict);
-                StockValues futureStockValue = new StockValues(tick.getEndTime().toCalendar(Locale.ROOT), tick.getClosePrice().toDouble(), saida, timeSeries.getTick(i).getClosePrice().toDouble());
-                double increase = ((saida - timeSeries.getTick(i).getClosePrice().toDouble()) / timeSeries.getTick(i).getClosePrice().toDouble()) * 100d;
-                futureStockValue.setIncrease(increase);
-                futureValues.add(futureStockValue);
+                double saidaAnterior = TrainingNeuralNetwork.toPredict(company, i-1, company.getNormalizerValue());
+                double saida = TrainingNeuralNetwork.toPredict(company, i, company.getNormalizerValue());
 
-                diferencaTotal += Math.abs(saida - timeSeries.getTick(i + tradesToPredict).getClosePrice().toDouble());
-                if ((anteriorCalculado < saida) && (anteriorReal < timeSeries.getTick(i + tradesToPredict).getClosePrice().toDouble())) {
-                    acerto += 1;
+                if (indexEndAccuracy > i) {
+                    StockValues futureStockValue = new StockValues(tick.getEndTime().toCalendar(Locale.ROOT), tick.getClosePrice().toDouble(), saida, timeSeries.getTick(i).getClosePrice().toDouble());
+                    double increase = ((saida - timeSeries.getTick(i).getClosePrice().toDouble()) / timeSeries.getTick(i).getClosePrice().toDouble()) * 100d;
+                    futureStockValue.setIncrease(increase);
+                    futureValues.add(futureStockValue);
+                } else {
+                    if ((anteriorCalculado < saida) && (anteriorReal < timeSeries.getTick(i + tradesToPredict).getClosePrice().toDouble())
+                            || (anteriorCalculado > saida) && (anteriorReal > timeSeries.getTick(i + tradesToPredict).getClosePrice().toDouble())) {
+                        acerto += 1;
+                    }
+                    totalTests++;
                 }
-                totalTests++;
+
                 anteriorCalculado = saida;
                 anteriorReal = timeSeries.getTick(i + tradesToPredict).getClosePrice().toDouble();
-//                } else {
-//                    System.out.println("Não tem como saber o futuro ainda!!");
 
             }
-            
-            company.setAccuracy((acerto/totalTests) * 100d);
+
+            double acc = acerto / totalTests;            
+            company.setAccuracy(acc);
 
             company.setFutureValues(futureValues);
             companies.add(company);

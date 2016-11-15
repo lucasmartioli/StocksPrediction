@@ -105,7 +105,7 @@ public class Company {
             total += Math.pow(getTechnicalIndicators().getClosePrice().getValue(i).toDouble() - mean, 2);
         }
 
-        variance = total / limit;
+        variance = total / limit - 1;
 
     }
 

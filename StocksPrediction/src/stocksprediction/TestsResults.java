@@ -43,7 +43,7 @@ public class TestsResults {
             Calendar di = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
             di.set(14, 6, 1, 12, 0);
             Calendar df = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
-            df.set(16, 10, 1, 12, 0);
+            df.set(16, 9, 1, 12, 0);
 
             Company company = LoadingCompany.loading("CPLE6", di, df);
 
@@ -60,7 +60,7 @@ public class TestsResults {
             int finalTreinamento = Math.round(((float) (indicadorFinal * 0.88d)));
             int inicioTestes = finalTreinamento + 1;
             int finalTestes = indicadorFinal;
-            
+
             TrainingNeuralNetwork.toTrain(company, inicioTreinamento, finalTreinamento, normalizerValue);
 
             org.jfree.data.time.TimeSeries chartResultados = new org.jfree.data.time.TimeSeries("Calculado");
@@ -85,9 +85,11 @@ public class TestsResults {
                     chartResultados.add(new Day(tick.getEndTime().toDate()), saida);
                     chartDiferencas.add(new Day(tick.getEndTime().toDate()), saida - timeSeries.getTick(i + tradesToPredict).getClosePrice().toDouble());
                     diferencaTotal += Math.abs(saida - timeSeries.getTick(i + tradesToPredict).getClosePrice().toDouble());
-                    if ((anteriorCalculado < saida) && (anteriorReal < timeSeries.getTick(i + tradesToPredict).getClosePrice().toDouble()))
+                    if ((anteriorCalculado < saida) && (anteriorReal < timeSeries.getTick(i + tradesToPredict).getClosePrice().toDouble())
+                            || (anteriorCalculado > saida) && (anteriorReal > timeSeries.getTick(i + tradesToPredict).getClosePrice().toDouble())) {
                         acerto += 1;
-                    
+                    }
+
                     totalTests++;
                     chartCandleC.add(new Day(tick.getEndTime().toDate()), (anteriorCalculado < saida) ? 1 : 0);
                     chartCandleR.add(new Day(tick.getEndTime().toDate()), (anteriorReal < timeSeries.getTick(i + tradesToPredict).getClosePrice().toDouble()) ? 1 : 0);
@@ -98,10 +100,10 @@ public class TestsResults {
                 }
                 System.out.println("");
             }
-            
+
             System.out.println("Total de testes: " + totalTests + " Total de acertos: " + acerto + " Diferença total: " + diferencaTotal);
-            System.out.println("Percentual de acertos: " + (acerto/totalTests) * 100d + "%" );
-            System.out.println("Média de diferença: " + (diferencaTotal/totalTests) );
+            System.out.println("Percentual de acertos: " + (acerto / totalTests) * 100d + "%");
+            System.out.println("Média de diferença: " + (diferencaTotal / totalTests));
 
             dataset.addSeries(buildChartTimeSeries(inicioTestes, timeSeries, company.getTechnicalIndicators().getClosePrice(), "Close Price"));
 //            dataset.addSeries(buildChartTimeSeries(inicioTestes, timeSeries, vivo.getTechnicalIndicators().getSma18days(), "SMA 18 dias"));
