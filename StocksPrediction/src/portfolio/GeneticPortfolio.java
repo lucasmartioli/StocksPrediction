@@ -19,7 +19,7 @@ public class GeneticPortfolio {
     private final ArrayList<Ativo> ativos;
     private ArrayList<Portfolio> population;
     private final int populationSize = 5;
-    private final int maxInteractions = 1000;
+    private final int maxInteractions = 500;
     private final int maxAmoutAtivo = 10;
     private final int sizeGeneration = 20;
 
@@ -30,12 +30,14 @@ public class GeneticPortfolio {
 
     public double objectiveFunction(Portfolio p) {
 
-//        return p.getProfit();
+//        return p.getProfit()/p.getInvestment(); //2.84%
 //        return p.getEstimatedProfit() + p.getAccuracy() - p.getVariance();
 //        return p.getEstimatedProfit() + p.getAccuracy() - p.getVariance();
-        return p.getEstimatedProfit() - p.getVariance();
-        //return p.getEstimatedProfit() + p.getAccuracy();
-//        return p.getEstimatedProfit() + p.getAccuracy() - p.getVariance() * p.getEstimatedProfit();
+        //return p.getEstimatedProfit() - p.getVariance() * p.getEstimatedProfit(); //1.69%
+//        return p.getEstimatedProfit() + p.getAccuracy();
+//        return p.getAccuracy(); 19.79%
+//        return p.getAccuracy() - p.getVariance(); // 3.04%
+        return p.getEstimatedProfit() + p.getAccuracy() - p.getVariance() * p.getEstimatedProfit(); // 20.82%
 
     }
 

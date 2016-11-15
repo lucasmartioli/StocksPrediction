@@ -68,7 +68,7 @@ public class PortfolioEficiente {
         companies.add("RADL3");
         companies.add("PCAR4");
         companies.add("LREN3");
-        companies.add("RLOG3");
+//        companies.add("RLOG3"); Não converge
         companies.add("NATU3");
         companies.add("CTIP3");
         companies.add("PSSA3");
@@ -79,8 +79,7 @@ public class PortfolioEficiente {
         companies.add("EQTL3");
         companies.add("SMLE3");
         companies.add("SMTO3");
-        companies.add("SMTO3");
-        companies.add("RENT3");
+//        companies.add("RENT3"); ????? Sera que eu tiro?
         companies.add("TOTS3");
         companies.add("GRND3");
         companies.add("ODPV3");

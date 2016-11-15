@@ -136,8 +136,8 @@ public class MakePortfolio {
 
             }
 
-            double acc = acerto / totalTests;            
-            company.setAccuracy(acc);
+            double accuracy = acerto / totalTests;            
+            company.setAccuracy(accuracy);
 
             company.setFutureValues(futureValues);
             companies.add(company);
