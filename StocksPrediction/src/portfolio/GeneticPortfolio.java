@@ -15,6 +15,7 @@ import java.util.Random;
  */
 public class GeneticPortfolio {
 
+    static String objectiveFunction = "";
     private final int portfolioSize;
     private final ArrayList<Ativo> ativos;
     private ArrayList<Portfolio> population;
@@ -37,7 +38,10 @@ public class GeneticPortfolio {
 //        return p.getEstimatedProfit() + p.getAccuracy();
 //        return p.getAccuracy(); 19.79%
 //        return p.getAccuracy() - p.getVariance(); // 3.04%
-        return p.getEstimatedProfit() + p.getAccuracy() - p.getVariance() * p.getEstimatedProfit(); // 20.82%
+//        return p.getEstimatedProfit() + p.getAccuracy() - p.getVariance() * p.getEstimatedProfit(); // 20.82%
+
+        objectiveFunction = "p.getEstimatedProfit() + p.getAccuracy() - p.getVariance() * p.getEstimatedProfit()";
+        return p.getEstimatedProfit() + p.getAccuracy() - p.getVariance() * p.getEstimatedProfit(); 
 
     }
 

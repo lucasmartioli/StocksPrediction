@@ -45,7 +45,7 @@ public class TestsResults {
             Calendar df = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
             df.set(16, 9, 1, 12, 0);
 
-            Company company = LoadingCompany.loading("RENT3", di, df);
+            Company company = LoadingCompany.loading("VIVT4", di, df);
 
             TimeSeries timeSeries = company.getTechnicalIndicators().getTimeSeries();
             int indicadorInicial = timeSeries.getBegin();

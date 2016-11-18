@@ -34,7 +34,7 @@ public class MakePortfolio {
     private ArrayList<Company> companies;
     private final Period period;
     private final int portfolioSize;
-    private final int tradesToPredict = 1;
+    private final int tradesToPredict = 5;
 
     public MakePortfolio(ArrayList<String> companySymbols, Period period, int portfolioSize) {
         this.companySymbols = companySymbols;
@@ -109,7 +109,7 @@ public class MakePortfolio {
             double anteriorReal = 0d;
             double totalTests = 0d;
             double acerto = 0d;
-            int indexEndAccuracy = inicioTestes + Math.round(((float) ((finalTestes - inicioTestes ) * 0.7)));
+            int indexEndAccuracy = inicioTestes + Math.round(((float) ((finalTestes - inicioTestes ) * 0.5)));
             ArrayList<StockValues> futureValues = new ArrayList<>();
 
             for (int i = inicioTestes; i <= finalTestes - tradesToPredict; i++) {

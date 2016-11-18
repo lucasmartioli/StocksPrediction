@@ -99,68 +99,72 @@ public class PortfolioEficiente {
         companies.add("MPLU3");
 //        companies.add("CPRE3"); Problemas na rede RSI
 //        companies.add("TAEE3"); Sem indicadores
-
-
-        Calendar di = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
-        di.set(14, 6, 1, 12, 0);
-        Calendar df = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
-        df.set(16, 9, 1, 12, 0);
         TimeSeriesCollection dataset = new TimeSeriesCollection();
 
-        Period period = new Period(di, df, 0.88, 0.12);
+        for (int i = 0; i < 10; i++) {
 
-        MakePortfolio makePortfolio = new MakePortfolio(companies, period, 10);
+            Calendar di = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
+            di.set(14, 6, 1, 12, 0);
+            Calendar df = Calendar.getInstance(TimeZone.getTimeZone("America/Sao Paulo"));
+            df.set(16, 9, 1, 12, 0);
 
-        try {
-            makePortfolio.make();
-        } catch (IOException ex) {
-            Logger.getLogger(PortfolioEficiente.class.getName()).log(Level.SEVERE, null, ex);
-        }
+            Period period = new Period(di, df, 0.88, 0.12);
 
-        org.jfree.data.time.TimeSeries chartProfit = new org.jfree.data.time.TimeSeries("Profit");
-        org.jfree.data.time.TimeSeries chartID = new org.jfree.data.time.TimeSeries("ID");
-        org.jfree.data.time.TimeSeries chartEstimatedProfit = new org.jfree.data.time.TimeSeries("Estimated Profit");
-        org.jfree.data.time.TimeSeries chartInvestiment = new org.jfree.data.time.TimeSeries("Investiment");
-        org.jfree.data.time.TimeSeries chartVariance = new org.jfree.data.time.TimeSeries("Variance");
-        org.jfree.data.time.TimeSeries chartAccuracy = new org.jfree.data.time.TimeSeries("Accuracy");
+            MakePortfolio makePortfolio = new MakePortfolio(companies, period, 10);
 
-        double totalDeInvestimento = 0d;
-        double totalInvestimentoEfetuado = 0d;
-        double lucroBruto = 0d;
-        double lucroDeInvestimento = 0d;
-        double totalDeAccuracy = 0d;
-        int totalDePortfolios = 0;
-        for (Portfolio p : makePortfolio.getPortfolios()) {
-            if (p.getEstimatedProfit() > 0) {
-                lucroDeInvestimento += p.getProfit();
-                totalDeInvestimento += p.getInvestment();
+            try {
+                makePortfolio.make();
+            } catch (IOException ex) {
+                Logger.getLogger(PortfolioEficiente.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            lucroBruto += p.getProfit();
-            totalInvestimentoEfetuado += p.getInvestment();
-            
-//            System.out.println(p.toString());
-            System.out.println(p.toStringResum());
-            chartProfit.addOrUpdate(new Day(p.getDate().getTime()), p.getProfit());
-            chartID.addOrUpdate(new Day(p.getDate().getTime()), p.getId());
-            chartEstimatedProfit.addOrUpdate(new Day(p.getDate().getTime()), p.getInvestment() + (p.getEstimatedProfit() * p.getInvestment()));
-            chartInvestiment.addOrUpdate(new Day(p.getDate().getTime()), p.getInvestment());
-            chartVariance.addOrUpdate(new Day(p.getDate().getTime()), p.getVariance());
-            chartAccuracy.addOrUpdate(new Day(p.getDate().getTime()), p.getAccuracy());
-            System.out.println("p.getAccuracy(): " + p.getAccuracy());
-            totalDeAccuracy+=p.getAccuracy();
-            totalDePortfolios++;
-        }
-        System.out.println("Accuracy: " + totalDeAccuracy/totalDePortfolios);
-        System.out.println("Lucro: " + lucroBruto + "(ou prejuizo) e lucro liquido: " + lucroDeInvestimento);
-        System.out.println("Lucro %: " + (lucroBruto/totalInvestimentoEfetuado) * 100d + "(ou prejuizo) e lucro liquido %: " + (lucroDeInvestimento/totalDeInvestimento) * 100d);
+            org.jfree.data.time.TimeSeries chartProfit = new org.jfree.data.time.TimeSeries("Profit");
+            org.jfree.data.time.TimeSeries chartID = new org.jfree.data.time.TimeSeries("ID");
+            org.jfree.data.time.TimeSeries chartEstimatedProfit = new org.jfree.data.time.TimeSeries("Estimated Profit");
+            org.jfree.data.time.TimeSeries chartInvestiment = new org.jfree.data.time.TimeSeries("Investiment");
+            org.jfree.data.time.TimeSeries chartVariance = new org.jfree.data.time.TimeSeries("Variance");
+            org.jfree.data.time.TimeSeries chartAccuracy = new org.jfree.data.time.TimeSeries("Accuracy");
 
-        dataset.addSeries(chartProfit);
+            double totalDeInvestimento = 0d;
+            double totalInvestimentoEfetuado = 0d;
+            double lucroBruto = 0d;
+            double lucroDeInvestimento = 0d;
+            double totalDeAccuracy = 0d;
+            int totalDePortfolios = 0;
+            for (Portfolio p : makePortfolio.getPortfolios()) {
+                if (p.getEstimatedProfit() > 0) {
+                    lucroDeInvestimento += p.getProfit();
+                    totalDeInvestimento += p.getInvestment();
+                }
+
+                lucroBruto += p.getProfit();
+                totalInvestimentoEfetuado += p.getInvestment();
+
+//            System.out.println(p.toString());
+                System.out.println(p.toStringResum());
+                chartProfit.addOrUpdate(new Day(p.getDate().getTime()), p.getProfit());
+                chartID.addOrUpdate(new Day(p.getDate().getTime()), p.getId());
+                chartEstimatedProfit.addOrUpdate(new Day(p.getDate().getTime()), p.getInvestment() + (p.getEstimatedProfit() * p.getInvestment()));
+                chartInvestiment.addOrUpdate(new Day(p.getDate().getTime()), p.getInvestment());
+                chartVariance.addOrUpdate(new Day(p.getDate().getTime()), p.getVariance());
+                chartAccuracy.addOrUpdate(new Day(p.getDate().getTime()), p.getAccuracy());
+                System.out.println("p.getAccuracy(): " + p.getAccuracy());
+                totalDeAccuracy += p.getAccuracy();
+                totalDePortfolios++;
+            }
+            System.out.println("Total de portfolios: " + totalDePortfolios);
+            System.out.println("Accuracy: " + totalDeAccuracy / totalDePortfolios);
+            System.out.println(GeneticPortfolio.objectiveFunction);
+            System.out.println("Lucro: " + lucroBruto + "(ou prejuizo) e lucro liquido: " + lucroDeInvestimento);
+            System.out.println("Lucro %: " + (lucroBruto / totalInvestimentoEfetuado) * 100d + "(ou prejuizo) e lucro liquido %: " + (lucroDeInvestimento / totalDeInvestimento) * 100d);
+
+            dataset.addSeries(chartProfit);
 //        dataset.addSeries(chartEstimatedProfit);
 //        dataset.addSeries(chartAccuracy);
 //        dataset.addSeries(chartInvestiment);
 //        dataset.addSeries(chartVariance);
 //        dataset.addSeries(chartID);
+        }
 
         /**
          * Creating the chart
