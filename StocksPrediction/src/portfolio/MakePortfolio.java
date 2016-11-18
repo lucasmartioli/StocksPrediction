@@ -85,8 +85,10 @@ public class MakePortfolio {
     private void testsNNs() throws IOException {
 
         companies = new ArrayList<>();
+        
 
         for (String companySymbol : companySymbols) {
+            System.out.println("Testes para " + companySymbol + " iniciados.");
 
             Company company = LoadingCompany.loading(companySymbol, period.getDateInitial(), period.getDateFinal());
 
@@ -115,7 +117,7 @@ public class MakePortfolio {
             for (int i = inicioTestes; i <= finalTestes - tradesToPredict; i++) {
 
                 Tick tick = timeSeries.getTick(i + tradesToPredict);
-                double saidaAnterior = TrainingNeuralNetwork.toPredict(company, i-1, company.getNormalizerValue());
+                
                 double saida = TrainingNeuralNetwork.toPredict(company, i, company.getNormalizerValue());
 
                 if (indexEndAccuracy > i) {
@@ -141,6 +143,7 @@ public class MakePortfolio {
 
             company.setFutureValues(futureValues);
             companies.add(company);
+            System.out.println("Finalizado.");
         }
 
     }

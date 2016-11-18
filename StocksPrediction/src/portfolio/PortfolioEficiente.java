@@ -154,7 +154,9 @@ public class PortfolioEficiente {
             }
             System.out.println("Total de portfolios: " + totalDePortfolios);
             System.out.println("Accuracy: " + totalDeAccuracy / totalDePortfolios);
+            
             System.out.println(GeneticPortfolio.objectiveFunction);
+            System.out.println("Investimento: " + totalInvestimentoEfetuado);
             System.out.println("Lucro: " + lucroBruto + "(ou prejuizo) e lucro liquido: " + lucroDeInvestimento);
             System.out.println("Lucro %: " + (lucroBruto / totalInvestimentoEfetuado) * 100d + "(ou prejuizo) e lucro liquido %: " + (lucroDeInvestimento / totalDeInvestimento) * 100d);
 

@@ -143,7 +143,7 @@ public class PredictionNeuralNetwork {
     }
 
     public double[] toPredict(double[] input) {
-        System.out.println("Iniciando uso da rede " + fileNameNeuralNetwork + ".");
+//        System.out.println("Iniciando uso da rede " + fileNameNeuralNetwork + ".");
         NeuralNetwork neuralNetworkLoad;
         neuralNetworkLoad = NeuralNetwork.createFromFile(fileNameNeuralNetwork);
         neuralNetworkLoad.setInput(input);
@@ -165,7 +165,7 @@ public class PredictionNeuralNetwork {
 //        }
 
 //        System.out.println("");
-        System.out.println("Finalizado o uso da rede " + fileNameNeuralNetwork + ".");
+//        System.out.println("Finalizado o uso da rede " + fileNameNeuralNetwork + ".");
 
         return neuralNetworkLoad.getOutput();
 
