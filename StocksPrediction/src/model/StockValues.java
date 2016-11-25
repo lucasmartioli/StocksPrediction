@@ -14,7 +14,7 @@ import yahoofinance.histquotes.HistoricalQuote;
  *
  * @author Lucas
  */
-public class StockValues {
+public class StockValues implements Comparable<StockValues>{
 
     private Calendar date;
 
@@ -24,6 +24,7 @@ public class StockValues {
     private BigDecimal close;
     private BigDecimal predictedClose;
     private BigDecimal beforeClose;
+    private BigDecimal beforeRealClose;
     private Double increase;
 
     //private BigDecimal adjClose;
@@ -38,11 +39,12 @@ public class StockValues {
 
     }
 
-    public StockValues(Calendar date, double close, double predictedClose, double beforeClose) {
+    public StockValues(Calendar date, double close, double predictedClose, double beforeClose, double beforeRealClose) {
         this.date = date;
         this.close = new BigDecimal(close);
         this.predictedClose = new BigDecimal(predictedClose);
         this.beforeClose = new BigDecimal(beforeClose);
+        this.beforeRealClose = new BigDecimal(beforeRealClose);
     }
 
     public StockValues(Stock consulta) {
@@ -52,6 +54,11 @@ public class StockValues {
         this.low = consulta.getQuote().getDayLow();
         this.high = consulta.getQuote().getDayHigh();
     }
+
+    public BigDecimal getBeforeRealClose() {
+        return beforeRealClose;
+    }
+    
 
     public Calendar getDate() {
         return date;
@@ -120,6 +127,12 @@ public class StockValues {
     @Override
     public String toString() {
         return "StockValues{" + "date=" + date.getTime() + ", open=" + open + ", low=" + low + ", high=" + high + ", close=" + close + ", predictedClose=" + predictedClose + ", beforeClose=" + beforeClose + ", increase=" + increase + '}';
+    }
+
+    @Override
+    public int compareTo(StockValues t) {
+        return date.compareTo(t.getDate());
+        
     }
 
 }

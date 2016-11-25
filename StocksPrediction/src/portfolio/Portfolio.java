@@ -74,21 +74,16 @@ public class Portfolio {
         covariance = accuracy = variance = estimatedProfit = investment = profit = 0;
 
         int t = 0;
-//        int totalDeAtivos = 0;
-//        for (Map.Entry<String, Integer> entry : amountsAtivos.entrySet()) {
-//            totalDeAtivos += entry.getValue();
-//            if (entry.getValue() > 0) {
-//                
-//            }
-//        }
 
         for (Ativo ativo : ativos) {
-            profit += ((ativo.getValues().getClose().doubleValue() - ativo.getValues().getBeforeClose().doubleValue())) * amountsAtivos.get(ativo.getSymbol());
+            profit += ((ativo.getValues().getClose().doubleValue() - ativo.getValues().getBeforeRealClose().doubleValue())) * amountsAtivos.get(ativo.getSymbol());
             estimatedProfit += ((ativo.getValues().getPredictedClose().doubleValue() - ativo.getValues().getBeforeClose().doubleValue()) / ativo.getValues().getBeforeClose().doubleValue()) * amountsAtivos.get(ativo.getSymbol());
-            investment += ativo.getValues().getBeforeClose().doubleValue() * amountsAtivos.get(ativo.getSymbol());
+            investment += ativo.getValues().getBeforeRealClose().doubleValue() * amountsAtivos.get(ativo.getSymbol());            
             variance += ativo.getVariance() * amountsAtivos.get(ativo.getSymbol());
             accuracy += ativo.getAccuracy() * amountsAtivos.get(ativo.getSymbol());
-            t++;
+            if (amountsAtivos.get(ativo.getSymbol()) > 0) {
+                t++;
+            }
         }
 
         accuracy /= t;
@@ -125,6 +120,33 @@ public class Portfolio {
                 + ", profit=" + profit + "\n"
                 + ", estimatedProfit=" + estimatedProfit + "\n"
                 + ", variance=" + variance + '}';
+    }
+
+    public static String cabecExcel() {
+        return "Teste" + "\t" + "Data" + "\t" + "Investimento" + "\t" + "Lucro" + "\t" + "Estimativa retorno" + "\t" + "Estimativa de Lucro" + "\t" + "% de Lucro" + "\t" + "Ativos";
+    }
+
+    public String toExcel() {
+        return "\t" + ativos.get(1).getValues().getDate().getTime() + "\t" + investment + "\t" + profit + "\t" + estimatedProfit + "\t" + "\t" + "\t" + ativosToString();
+    }
+    
+    public String ativosToString() {
+        String r = "";
+         for (Map.Entry<String, Integer> entry : amountsAtivos.entrySet()) {
+            r += entry.getKey() + " X " + entry.getValue() + "---" + searchAtivo(entry.getKey()).getValues().getBeforeRealClose()+ "  " + searchAtivo(entry.getKey()).getValues().getClose();
+
+        }
+         return r;
+    }
+    
+    private Ativo searchAtivo(String k) {
+        for (Ativo ativo : ativos) {
+            if (ativo.getSymbol() == k)
+                return ativo;
+            
+        }
+        return null;
+        
     }
 
     public String toStringResum() {

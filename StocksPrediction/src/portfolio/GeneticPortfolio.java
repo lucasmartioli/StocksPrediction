@@ -20,7 +20,7 @@ public class GeneticPortfolio {
     private final ArrayList<Ativo> ativos;
     private ArrayList<Portfolio> population;
     private final int populationSize = 5;
-    private final int maxInteractions = 500;
+    private final int maxInteractions = 1000;
     private final int maxAmoutAtivo = 10;
     private final int sizeGeneration = 20;
 
@@ -31,17 +31,18 @@ public class GeneticPortfolio {
 
     public double objectiveFunction(Portfolio p) {
 
+        objectiveFunction = "p.getEstimatedProfit() + p.getAccuracy() - p.getVariance()";
 //        return p.getProfit()/p.getInvestment(); //2.84%
 //        return p.getEstimatedProfit() + p.getAccuracy() - p.getVariance();
 //        return p.getEstimatedProfit() + p.getAccuracy() - p.getVariance();
         //return p.getEstimatedProfit() - p.getVariance() * p.getEstimatedProfit(); //1.69%
 //        return p.getEstimatedProfit() + p.getAccuracy();
-//        return p.getAccuracy(); 19.79%
+//        return p.getAccuracy(); //19.79%
 //        return p.getAccuracy() - p.getVariance(); // 3.04%
 //        return p.getEstimatedProfit() + p.getAccuracy() - p.getVariance() * p.getEstimatedProfit(); // 20.82%
 
-        objectiveFunction = "p.getEstimatedProfit() + p.getAccuracy() - p.getVariance() * p.getEstimatedProfit()";
-        return p.getEstimatedProfit() + p.getAccuracy() - p.getVariance() * p.getEstimatedProfit(); 
+        
+        return p.getEstimatedProfit() + p.getAccuracy() - p.getVariance(); 
 
     }
 
@@ -123,7 +124,7 @@ public class GeneticPortfolio {
 
         int i = 0;
         for (; i < lineCross; i++) {
-            p3.setAmoutForAtivo(p1.getAtivo(i), /*p1.getAmount(p1.getAtivo(i))*/gerador.nextInt(maxAmoutAtivo));
+            p3.setAmoutForAtivo(p1.getAtivo(i), gerador.nextInt(maxAmoutAtivo));
             p3.addAtivo(p1.getAtivo(i));
         }
 

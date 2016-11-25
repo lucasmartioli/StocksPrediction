@@ -6,6 +6,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import technicalindicators.TechnicalIndicators;
 import yahoofinance.histquotes.HistoricalQuote;
@@ -81,6 +82,12 @@ public class Company {
     }
 
     public void setFutureValues(ArrayList<StockValues> futureValues) {
+        Collections.sort(futureValues);
+
+//        for (StockValues futureValue : futureValues) {
+//            System.out.println(futureValue.getDate().getTime());
+//        }
+
         this.futureValues = futureValues;
     }
 
